@@ -4,6 +4,7 @@
 
 #include "../CommonTypes/Vector.h"
 #include "../CommonUtils/Assert.h"
+#include "../CommonTypes/Exception.h"
 
 using namespace Common;
 
@@ -94,7 +95,7 @@ namespace VectorTests
 
 	void VectorTestAssignment()
 	{
-
+		
 	}
 
 	void VectorTestPushPopShift()
@@ -104,6 +105,48 @@ namespace VectorTests
 		TVector<int> Third = { 1,2,3,4,5,6,7,8,9 };
 		First.Push(Second.Begin(), Second.End());
 		ASSERT(First == Third, "Vector PushPopShift error");
+
+		First = {};
+		First.Push(1);
+		First.Push(2);
+		First.Push(3);
+		First.Push(4);
+		First.ShiftMultiple(2, true);
+
+		ASSERT(First.Shift() == 3 && First.Pop() == 4 && First.GetSize() == 0,
+			"Vector PushPopShift error");
+
+		First = { 1,2,3,4,5 };
+		First.PopMultiple(12);
+		First.PopMultiple(12);
+		ASSERT(First.GetSize() == 0, "Vector PushPopShift error");
+
+		First = { 1,2,3,4,5 };
+		First.ShiftMultiple(12);
+		First.ShiftMultiple(12);
+		ASSERT(First.GetSize() == 0, "Vector PushPopShift error");
+
+		bool bThrown = false;
+		try
+		{
+			First.SafePop();
+		} 
+		catch (COutOfRange& Ex)
+		{
+			++bThrown;
+		}
+		ASSERT(bThrown, "Vector PushPopShift error");
+
+		bThrown = false;
+		try
+		{
+			First.SafeShift();
+		}
+		catch (COutOfRange& Ex)
+		{
+			++bThrown;
+		}
+		ASSERT(bThrown, "Vector PushPopShift error");
 	}
 
 	void VectorTestInsert()
@@ -167,6 +210,37 @@ namespace VectorTests
 
 	void VectorTestErase()
 	{
+		TVector<int> First = { 1,2,3,4,5 };
+		First.Erase(0);
+		First.Erase(1, true);
+		TVector<int> Second = { 2,4,5 };
+		ASSERT(First == Second, "Vector erase error");
+
+		First.Erase(2);
+		Second = { 2,4 };
+		ASSERT(First == Second, "Vector erase error");
+
+		First.Erase(0);
+		First.Erase(0, true);
+		Second = {};
+		ASSERT(First == Second, "Vector erase error");
+
+		First = { 1,2,3,4,5 };
+		First.EraseMultiple(2, 10, true);
+		Second = { 1,2 };
+		ASSERT(First == Second, "Vector erase error");
+
+		First = { 1,2,3,4,5 };
+		First.EraseMultiple(0, 1);
+		Second = { 2,3,4,5 };
+		ASSERT(First == Second, "Vector erase error");
+
+		First.EraseMultiple(0, 2);
+		First.EraseMultiple(0, 0);
+		First.EraseMultiple(0, 0);
+		First.Erase(100);
+		Second = { 4,5 };
+		ASSERT(First == Second, "Vector erase error");
 
 	}
 

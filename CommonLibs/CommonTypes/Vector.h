@@ -319,6 +319,9 @@ namespace Common
 		 * @param bAllowAutoShrink Enables auto shrink
 		 *		  according to the capacity rule. See: SetCapacityRule()
 		 * @note If Position is greater than max index, does nothing.
+		 * @warning This method removes one element. To remove multiple,
+		 *			use EraseMultiple(). Your code with such a mistake
+		 *			will be compiled because of optional bool param.
 		*/
 		void Erase(size_t Position, bool bAllowAutoShrink = false);
 		
@@ -330,6 +333,10 @@ namespace Common
 		 * @param bAllowAutoShrink Optional. Enables auto shrink
 		 *		  according to the capacity rule. See: SetCapacityRule()
 		 * @note Ignores elements at unavailable positions.
+		 * @warning This method removes multiple elements. To remove one,
+		 *			use Erase(). Your code with such a mistake will be
+		 *			compiled because of optional bool param.
+		 * 
 		*/
 		void EraseMultiple(size_t PositionFrom, size_t PositionTo,
 			bool bAllowAutoShrink = false);
