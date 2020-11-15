@@ -8,7 +8,7 @@ namespace Common
 
 	public:
 
-		TIterator(T* InitialPosition)
+		TIterator(PointerType InitialPosition)
 			: InternalPointer(InitialPosition) {}
 
 		const TIterator& operator ++ ()
@@ -17,12 +17,12 @@ namespace Common
 			return *this;
 		}
 
-		TIterator operator + (unsigned int Offset)
+		TIterator operator + (size_t Offset)
 		{
 			return TIterator(InternalPointer + Offset);
 		}
 
-		const TIterator& operator += (unsigned int Offset)
+		const TIterator& operator += (size_t Offset)
 		{
 			InternalPointer += Offset;
 			return *this;
@@ -34,12 +34,12 @@ namespace Common
 			return *this;
 		}
 
-		TIterator operator - (unsigned int Offset)
+		TIterator operator - (size_t Offset)
 		{
 			return TIterator(InternalPointer - Offset);
 		}
 
-		const TIterator& operator -= (unsigned int Offset)
+		const TIterator& operator -= (size_t Offset)
 		{
 			InternalPointer -= Offset;
 			return *this;
@@ -75,8 +75,8 @@ namespace Common
 
 	public:
 
-		TReverseIterator(T* InitialPosition)
-			: InternalPointer(InitialPosition) {};
+		TReverseIterator(PointerType InitialPosition)
+			: InternalPointer(InitialPosition - 1) {};
 
 		const TReverseIterator& operator ++ ()
 		{
@@ -84,12 +84,12 @@ namespace Common
 			return *this;
 		}
 
-		TReverseIterator operator + (unsigned int Offset)
+		TReverseIterator operator + (size_t Offset)
 		{
 			return TReverseIterator(InternalPointer - Offset);
 		}
 
-		const TReverseIterator& operator += (unsigned int Offset)
+		const TReverseIterator& operator += (size_t Offset)
 		{
 			InternalPointer -= Offset;
 			return *this;
@@ -101,12 +101,12 @@ namespace Common
 			return *this;
 		}
 
-		TReverseIterator operator - (unsigned int Offset)
+		TReverseIterator operator - (size_t Offset)
 		{
 			return TReverseIterator(InternalPointer + Offset);
 		}
 
-		const TReverseIterator& operator -= (unsigned int Offset)
+		const TReverseIterator& operator -= (size_t Offset)
 		{
 			InternalPointer += Offset;
 			return *this;
@@ -140,7 +140,7 @@ namespace Common
 
 	public:
 
-		TSafeIterator(T* InitialPosition, const TVector<T>* Owner)
+		TSafeIterator(PointerType InitialPosition, const TVector<T>* Owner)
 			: InternalPointer(InitialPosition), Owner(Owner) {};
 
 		const TSafeIterator& operator ++ ()
@@ -148,28 +148,33 @@ namespace Common
 			if (InternalPointer == Owner->Buffer + Owner->Size)
 			{
 				throw COutOfRange("Out of range: vector iterator ++",
-					InternalPointer + 1 - Buffer, Size);
+					static_cast<int>(InternalPointer - Owner->Buffer),
+					TPair<size_t, size_t>(0, Owner->Size));
 			}
 			++InternalPointer;
 			return *this;
 		}
 
-		TSafeIterator operator + (unsigned int Offset)
+		TSafeIterator operator + (size_t Offset)
 		{
 			if (InternalPointer + Offset > Owner->Buffer + Owner->Size)
 			{
 				throw COutOfRange("Out of range: vector iterator +",
-					InternalPointer + Offset - Buffer, Size);
+					static_cast<int>(InternalPointer - 1 - Owner->Buffer)
+					+ static_cast<int>(Offset),
+					TPair<size_t, size_t>(0, Owner->Size));
 			}
 			return TSafeIterator(InternalPointer + Offset, Owner);
 		}
 
-		const TSafeIterator& operator += (unsigned int Offset)
+		const TSafeIterator& operator += (size_t Offset)
 		{
 			if (InternalPointer + Offset > Owner->Buffer + Owner->Size)
 			{
 				throw COutOfRange("Out of range: vector iterator +=",
-					InternalPointer + Offset - Buffer, Size);
+					static_cast<int>(InternalPointer - 1 - Owner->Buffer)
+					+ static_cast<int>(Offset),
+					TPair<size_t, size_t>(0, Owner->Size));
 			}
 			InternalPointer += Offset;
 			return *this;
@@ -180,28 +185,33 @@ namespace Common
 			if (InternalPointer == Owner->Buffer)
 			{
 				throw COutOfRange("Out of range: vector iterator --",
-					InternalPointer - 1 - Buffer, Size);
+					static_cast<int>(InternalPointer - 1 - Owner->Buffer),
+					TPair<size_t, size_t>(0, Owner->Size));
 			}
 			--InternalPointer;
 			return *this;
 		}
 
-		TSafeIterator operator - (unsigned int Offset)
+		TSafeIterator operator - (size_t Offset)
 		{
 			if (InternalPointer - Offset < Owner->Buffer)
 			{
 				throw COutOfRange("Out of range: vector iterator -",
-					InternalPointer - Offset - Buffer, Size);
+					static_cast<int>(InternalPointer - Owner->Buffer)
+					- static_cast<int>(Offset),
+					TPair<size_t, size_t>(0, Owner->Size));
 			}
-			return TSafeIterator(InternalPointer - Offset);
+			return TSafeIterator(InternalPointer - Offset, Owner);
 		}
 
-		const TSafeIterator& operator -= (unsigned int Offset)
+		const TSafeIterator& operator -= (size_t Offset)
 		{
 			if (InternalPointer - Offset < Owner->Buffer)
 			{
 				throw COutOfRange("Out of range: vector iterator -=",
-					InternalPointer - Offset - Buffer, Size);
+					static_cast<int>(InternalPointer - Owner->Buffer)
+					-static_cast<int>(Offset),
+					TPair<size_t, size_t>(0, Owner->Size));
 			}
 			InternalPointer -= Offset;
 			return *this;
@@ -225,7 +235,7 @@ namespace Common
 	private:
 
 		PointerType InternalPointer;
-		TVector<T>* Owner;
+		const TVector<T>* const Owner;
 
 	};
 
@@ -238,37 +248,41 @@ namespace Common
 
 	public:
 
-		TSafeReverseIterator(T* InitialPosition, const TVector<T>* Owner)
-			: InternalPointer(InitialPosition), Owner(Owner) {};
+		TSafeReverseIterator(PointerType InitialPosition, const TVector<T>* Owner)
+			: InternalPointer(InitialPosition - 1), Owner(Owner) {};
 
 		const TSafeReverseIterator& operator ++ ()
 		{
-			if (InternalPointer == Owner->Buffer)
+			if (InternalPointer + 1 == Owner->Buffer)
 			{
 				throw COutOfRange("Out of range: vector reverse iterator ++",
-					InternalPointer - 1 - Buffer, Size);
+					static_cast<int>(InternalPointer - Owner->Buffer),
+					TPair<size_t, size_t>(0, Owner->Size));
 			}
 			--InternalPointer;
 			return *this;
 		}
 
-		TSafeReverseIterator operator + (unsigned int Offset)
+		TSafeReverseIterator operator + (size_t Offset)
 		{
-			if (InternalPointer - Offset < Owner->Buffer)
+			if (InternalPointer + 1 - Offset < Owner->Buffer)
 			{
 				throw COutOfRange("Out of range: vector reverse iterator +",
-					InternalPointer - Offset - Buffer, Size);
+					static_cast<int>(InternalPointer + 1 - Owner->Buffer)
+					- static_cast<int>(Offset),
+					TPair<size_t, size_t>(0, Owner->Size));
 			}
-			return TSafeReverseIterator(InternalPointer - Offset,
-				Owner);
+			return TSafeReverseIterator(InternalPointer - Offset, Owner);
 		}
 
-		const TSafeReverseIterator& operator += (unsigned int Offset)
+		const TSafeReverseIterator& operator += (size_t Offset)
 		{
-			if (InternalPointer - Offset < Owner->Buffer)
+			if (InternalPointer + 1 - Offset < Owner->Buffer)
 			{
 				throw COutOfRange("Out of range: vector reverse iterator +=",
-					InternalPointer - Offset - Buffer, Size);
+					static_cast<int>(InternalPointer + 1 - Owner->Buffer)
+					- static_cast<int>(Offset),
+					TPair<size_t, size_t>(0, Owner->Size));
 			}
 			InternalPointer -= Offset;
 			return *this;
@@ -276,32 +290,36 @@ namespace Common
 
 		const TSafeReverseIterator& operator -- ()
 		{
-			if (InternalPointer == Owner->Buffer + Owner->Size)
+			if (InternalPointer + 1 == Owner->Buffer + Owner->Size)
 			{
 				throw COutOfRange("Out of range: vector reverse iterator -- ",
-					InternalPointer + 1 - Buffer, Size);
+					static_cast<int>(InternalPointer + 1 - Owner->Buffer),
+					TPair<size_t, size_t>(0, Owner->Size));
 			}
 			++InternalPointer;
 			return *this;
 		}
 
-		TSafeReverseIterator operator - (unsigned int Offset)
+		TSafeReverseIterator operator - (size_t Offset)
 		{
-			if (InternalPointer + Offset > Owner->Buffer + Owner->Size)
+			if (InternalPointer + 1 + Offset > Owner->Buffer + Owner->Size)
 			{
 				throw COutOfRange("Out of range: vector reverse iterator -",
-					InternalPointer + Offset + Buffer, Size);
+					static_cast<int>(InternalPointer - Owner->Buffer)
+					+ static_cast<int>(Offset),
+					TPair<size_t, size_t>(0, Owner->Size));
 			}
-			return TSafeReverseIterator(InternalPointer + Offset,
-				Owner);
+			return TSafeReverseIterator(InternalPointer + Offset, Owner);
 		}
 
-		const TSafeReverseIterator& operator -= (unsigned int Offset)
+		const TSafeReverseIterator& operator -= (size_t Offset)
 		{
-			if (InternalPointer + Offset > Owner->Buffer + Owner->Size)
+			if (InternalPointer + 1 + Offset > Owner->Buffer + Owner->Size)
 			{
 				throw COutOfRange("Out of range: vector reverse iterator -=",
-					InternalPointer + Offset + Buffer, Size);
+					static_cast<int>(InternalPointer - Owner->Buffer)
+					+ static_cast<int>(Offset),
+					TPair<size_t, size_t>(0, Owner->Size));
 			}
 			InternalPointer += Offset;
 			return *this;
@@ -325,8 +343,8 @@ namespace Common
 	private:
 
 		PointerType InternalPointer;
-		TVector<T>* Owner;
+		const TVector<T>* const Owner;
 
 	};
-	
+
 }

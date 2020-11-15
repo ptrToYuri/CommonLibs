@@ -37,7 +37,7 @@ namespace Common {
 
 
 
-	class COutOfRange : protected CException
+	class COutOfRange : CException
 	{
 
 	public:
@@ -58,7 +58,7 @@ namespace Common {
 		 *		  Range: [First: Second)
 		*/
 		COutOfRange(const char* const Message,
-			size_t RequestedIndex, const TPair<size_t, size_t>& ExpectedIndex)
+			int RequestedIndex, const TPair<size_t, size_t>& ExpectedIndex)
 			: CException(Message), RequestedIndex(RequestedIndex),
 			ExpectedIndex(ExpectedIndex) {};
 
@@ -80,14 +80,14 @@ namespace Common {
 		 * @note Returns 0 Index with [0,0) range if constructed only
 		 *		 with message.
 		*/
-		virtual size_t GetRequestedIndex() const
+		virtual int GetRequestedIndex() const
 		{
 			return RequestedIndex;
 		}
 
 	protected:
 
-		size_t RequestedIndex = 0;
+		int RequestedIndex = 0;
 		TPair<size_t, size_t> ExpectedIndex = { 0,0 };
 
 	};

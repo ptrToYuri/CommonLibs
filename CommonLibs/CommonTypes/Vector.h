@@ -198,6 +198,16 @@ namespace Common
 		const T& SafeAt(size_t Index) const
 			{ return const_cast<TVector<T>*>(this)->SafeAt(Index); }
 
+		/**
+		 * @brief If element does not exist, this will resize vector and
+		 *		  fill newly created elements with provided value
+		 * @param Index aka offset value
+		 * @param DefaultValue Value to initialize added elements
+		 * @return Reference to the requested element
+		 * @see Use operator [] if you are sure, that element exists
+		*/
+		T& AutoAt(size_t Index, const T& DefaultValue = {});
+
 
 		/**
 		 * @brief Provides access to the internal buffer
@@ -359,7 +369,7 @@ namespace Common
 		 * @param bAllowAutoShrink Optional. Enables auto shrink
 		 *		  according to the capacity rule. See: SetCapacityRule()
 		*/
-		void Resize(rsize_t NewSize, const T& DefaultValue = {},
+		void Resize(size_t NewSize, const T& DefaultValue = {},
 			bool bAllowAutoShrink = false);
 
 		/**
@@ -571,18 +581,27 @@ namespace Common
 
 		/// Begin() alias (for compatibity)
 		CIterator begin() { return Begin(); }
+		/// ConstBegin() alias (overloaded, for compatibity)
+		CConstIterator begin() const { return ConstBegin(); }
 		/// ConstBegin() alias (for compatibity)
 		CConstIterator cbegin() const { return ConstBegin(); }
 		/// ReverseBegin() alias (for compatibity)
 		CReverseIterator rbegin() { return ReverseBegin(); }
+		/// ConstReverseBegin() alias (overloaded, for compatibity)
+		CConstReverseIterator rbegin() const { return ConstReverseBegin(); }
 		/// ConstReverseBegin() alias (for compatibity)
 		CConstReverseIterator crbegin() const { return ConstReverseBegin(); }
+	
 		/// End() alias (for compatibity)
 		CIterator end() { return End(); }
+		/// ConstEnd() alias (overloaded, for compatibity)
+		CConstIterator end() const { return ConstEnd(); }
 		/// ConstEnd() alias (for compatibity)
 		CConstIterator cend() const { return ConstEnd(); }
 		/// ReverseEnd() alias (for compatibity)
 		CReverseIterator rend() { return ReverseEnd(); }
+		/// ConstReverseEnd() alias (overloaded, for compatibity)
+		CConstReverseIterator rend() const { return ConstReverseEnd(); }
 		/// ConstReverseEnd() alias (for compatibity)
 		CConstReverseIterator crend() const { return ConstReverseEnd(); }
 

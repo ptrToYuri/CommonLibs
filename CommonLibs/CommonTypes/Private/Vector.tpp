@@ -201,12 +201,23 @@ namespace Common
 		if (Index >= Size)
 		{
 			throw COutOfRange("Out of range: [] vector",
-				Index, TPair<size_t, size_t>(0, Size));
+				static_cast<int>(Index), TPair<size_t, size_t>(0, Size));
 		}
 
 		return Buffer[Index];
 	}
 
+
+	template<typename T>
+	T & TVector<T>::AutoAt(size_t Index, const T & DefaultValue)
+	{
+		if(Index >= Size)
+		{
+			Resize(Index + 1, DefaultValue, false);
+		}
+
+		return Buffer[Index];
+	}
 
 
 	template<typename T>
@@ -534,7 +545,7 @@ namespace Common
 
 
 	template<typename T>
-	void TVector<T>::Resize(rsize_t NewSize, const T& DefaultValue,
+	void TVector<T>::Resize(size_t NewSize, const T& DefaultValue,
 		bool bAllowAutoShrink)
 	{
 		if (NewSize > Capacity)
@@ -727,7 +738,7 @@ namespace Common
 	typename TVector<T>::CSafeConstIterator
 		TVector<T>::SafeConstBegin() const
 	{
-		return CSafeConstIterator(Buffer);
+		return CSafeConstIterator(Buffer, this);
 	}
 
 	template<typename T>
@@ -772,14 +783,14 @@ namespace Common
 	template<typename T>
 	typename TVector<T>::CSafeIterator TVector<T>::SafeEnd()
 	{
-		return CSafeIterator(Buffer + Size);
+		return CSafeIterator(Buffer + Size, this);
 	}
 
 	template<typename T>
 	typename TVector<T>::CSafeConstIterator
 		TVector<T>::SafeConstEnd() const
 	{
-		return CSafeConstIterator(Buffer + Size);
+		return CSafeConstIterator(Buffer + Size, this);
 	}
 
 	template<typename T>
@@ -835,7 +846,7 @@ namespace Common
 		try {
 			return new T[NewCapacity];
 		}
-		catch (std::bad_alloc& Exception)
+		catch (const std::bad_alloc& Exception)
 		{
 			Capacity = 0;
 			Size = 0;
