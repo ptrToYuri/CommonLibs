@@ -210,7 +210,7 @@ namespace Common
 			{
 				throw COutOfRange("Out of range: vector iterator -=",
 					static_cast<int>(InternalPointer - Owner->Buffer)
-					-static_cast<int>(Offset),
+					- static_cast<int>(Offset),
 					TPair<size_t, size_t>(0, Owner->Size));
 			}
 			InternalPointer -= Offset;

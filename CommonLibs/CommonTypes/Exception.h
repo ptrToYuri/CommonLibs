@@ -64,7 +64,7 @@ namespace Common {
 
 		/**
 		 * @brief Specifies valid range.
-		 * @return Pair of Min and Max+1 indexes, that were 
+		 * @return Pair of Min and Max+1 indexes, that were
 		 *		   available. Range: [First: Second)
 		 * @note Returns 0 Index with [0,0) range if constructed only
 		 *		 with message.

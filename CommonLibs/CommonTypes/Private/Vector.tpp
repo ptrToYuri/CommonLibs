@@ -209,9 +209,9 @@ namespace Common
 
 
 	template<typename T>
-	T & TVector<T>::AutoAt(size_t Index, const T & DefaultValue)
+	T& TVector<T>::AutoAt(size_t Index, const T& DefaultValue)
 	{
-		if(Index >= Size)
+		if (Index >= Size)
 		{
 			Resize(Index + 1, DefaultValue, false);
 		}
@@ -300,7 +300,7 @@ namespace Common
 		Capacity = FutureCapacity;
 
 		if (Position <= Size)	// no fill required
-		{		
+		{
 
 			CopyFromArray(Position, Buffer, Temp);
 			CopyFromArray(Size - Position, Buffer + Position, Temp + Position + 1);
@@ -328,7 +328,7 @@ namespace Common
 
 	template <typename T>
 	template <typename IteratorType>
-	void TVector<T>::Insert(size_t Position, IteratorType Begin, 
+	void TVector<T>::Insert(size_t Position, IteratorType Begin,
 		IteratorType End, const T& FillOnResizeWith,
 		// disable this constructor when it is not expected
 		typename std::enable_if<!std::is_integral<
@@ -893,7 +893,7 @@ namespace Common
 
 	template <typename T>
 	template <typename IteratorType>
-	void TVector<T>::CopyFromIterators(IteratorType Begin, 
+	void TVector<T>::CopyFromIterators(IteratorType Begin,
 		IteratorType End, T* outBuffer)
 	{
 		size_t i = 0;

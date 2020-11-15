@@ -17,7 +17,7 @@ namespace Common
 	 * @brief Container representing array that can change its size.
 	 *
 	 * Fast in accessing elements as offsets are used, but not very
-	 * effective in terms of adding and removing elements. To minimize 
+	 * effective in terms of adding and removing elements. To minimize
 	 * those drawbacks, there are memory reserving rules that you can
 	 * manage.
 	 *
@@ -25,9 +25,9 @@ namespace Common
 	 *		 there are two methods: one that throws an exception ("Safe"
 	 *		 prefix) and another one that does assertion in debug mode.
 	 *		 Custom exception is COutOfRange, derived from CException
-	 * 
+	 *
 	 * @note May throw std::bad_alloc if allocation fails.
-	 *		 Allocation failure in assignment operations will cause the 
+	 *		 Allocation failure in assignment operations will cause the
 	 *		 vector to be cleared (as you intended to remove old elements
 	 *		 anyway). If allocation fails in insertions, resize, push/pop,
 	 *		 etc. - vector will stay in the previous state.
@@ -188,7 +188,7 @@ namespace Common
 		T& operator [] (size_t Index);
 
 		/// Index operator for const vectors.
-		const T& operator [] (size_t Index) const 
+		const T& operator [] (size_t Index) const
 			{ return const_cast<TVector<T>*>(this)->operator[](Index); }
 
 		/// [] with range check.
@@ -223,7 +223,7 @@ namespace Common
 		/**
 		 * @brief Checks if two vectors contain the same values by
 		 *		  calling equality operator recursively
-		 * @param Other Other vector to compare 
+		 * @param Other Other vector to compare
 		 * @return True if sizes and values are equal, false otherwise
 		 * @note Containing elements must implement == operator
 		*/
@@ -259,7 +259,7 @@ namespace Common
 		 *		  this value
 		 * @note If Position is greater than max index, vector is resized.
 		*/
-		void Insert(size_t Position, const T& Value = T {}, 
+		void Insert(size_t Position, const T& Value = T{},
 			const T& FillOnResizeWith = T{});
 
 		/**
@@ -279,7 +279,7 @@ namespace Common
 			// another SFINAE trick resolving conflicts with implicit cast
 			typename std::enable_if<!std::is_integral<
 			IteratorType>::value >::type* = 0);
-		
+
 		/**
 		 * @brief Removes one element from the end of vector.
 		 * @param bAllowAutoShrink Optional. Enables auto shrink
@@ -299,7 +299,7 @@ namespace Common
 		 *		  according to the capacity rule. See: SetCapacityRule()
 		 * @note If ElementsCount >= Size, clears vector
 		*/
-		void PopMultiple(size_t ElementsCount, 
+		void PopMultiple(size_t ElementsCount,
 			bool bAllowAutoShrink = false);
 
 		/**
@@ -334,7 +334,7 @@ namespace Common
 		 *			will be compiled because of optional bool param.
 		*/
 		void Erase(size_t Position, bool bAllowAutoShrink = false);
-		
+
 		/**
 		 * @brief Removes range of elements from vector
 		 * @param PositionFrom Starting index for erase
@@ -346,7 +346,7 @@ namespace Common
 		 * @warning This method removes multiple elements. To remove one,
 		 *			use Erase(). Your code with such a mistake will be
 		 *			compiled because of optional bool param.
-		 * 
+		 *
 		*/
 		void EraseMultiple(size_t PositionFrom, size_t PositionTo,
 			bool bAllowAutoShrink = false);
@@ -414,22 +414,22 @@ namespace Common
 		 *		  Reallocation on removal happens only if bool
 		 *		  bAllowAutoShrink was passed with supported operation
 		 *
-		 * EReservedCapacityRule::Exponential - [ADD] allocates 
+		 * EReservedCapacityRule::Exponential - [ADD] allocates
 		 * (NewSize-1)*2 if capacity exceed & vector is not small;
-		 * [ERASE] allocates 2*Size if Capacity > 4 * Size and vector 
+		 * [ERASE] allocates 2*Size if Capacity > 4 * Size and vector
 		 * is not small; <br>
-		 * 
-		 * EReservedCapacityRule::Linear - [ADD] allocates 
+		 *
+		 * EReservedCapacityRule::Linear - [ADD] allocates
 		 * NewSize + 3 + 32 / sizeof(T) if capacity exceed;
 		 * [ERASE] allocates Size + 4 + 32 / sizeof(T) if size
 		 * exceeds capacity by more than 2*(8 + 64 / sizeof(T)) <br>
-		 * 
-		 * 
+		 *
+		 *
 		 * EReservedCapacityRule::NeverReserve - memory is never
 		 * reserved automatically; if bAllowAutoShrink was passed
 		 * into a method, then ShrinkToFit() is called immediately
 		 *
-		 * @param CapacityRule 
+		 * @param CapacityRule Enum value from the list above
 		 * @note If bAllowAutoShrink was passed with operation, size
 		 *		 that you manually reserved may also be deallocated
 		*/
@@ -438,7 +438,7 @@ namespace Common
 		/**
 		 * @brief Returns Capacity rule that is currently applied.
 		 *		  It affects how elements are allocated & destructed
-		 * @return EReservedCapacityRule 
+		 * @return EReservedCapacityRule Current capacity rule
 		 * @see SetCapacityRule() for more info about presets.
 		*/
 		EReservedCapacityRule GetCapacityRule() const noexcept;
@@ -452,7 +452,7 @@ namespace Common
 		T& Front();
 
 		/// Front() for const vectors.
-		const T& Front() const 
+		const T& Front() const
 			{ return const_cast<TVector<T>*>(this)->Front(); }
 
 		/// Front() with range check.
@@ -481,7 +481,7 @@ namespace Common
 		const T& SafeBack() const
 			{ return const_cast<TVector<T>*>(this)->SafeBack(); }
 
-	
+
 		/**
 		 * @brief Iterator pointing to the first elem.
 		 * @return CIterator iterator
@@ -591,7 +591,7 @@ namespace Common
 		CConstReverseIterator rbegin() const { return ConstReverseBegin(); }
 		/// ConstReverseBegin() alias (for compatibity)
 		CConstReverseIterator crbegin() const { return ConstReverseBegin(); }
-	
+
 		/// End() alias (for compatibity)
 		CIterator end() { return End(); }
 		/// ConstEnd() alias (overloaded, for compatibity)
@@ -620,7 +620,7 @@ namespace Common
 		void AutoShrinkIfNeeded();
 
 		template <typename IteratorType>
-		inline void CopyFromIterators(IteratorType Begin, 
+		inline void CopyFromIterators(IteratorType Begin,
 			IteratorType End, T* Buffer);
 		inline void CopyFromArray(size_t Size, const T* const Array1, T* Array2);
 
