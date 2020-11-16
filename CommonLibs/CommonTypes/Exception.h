@@ -45,7 +45,7 @@ namespace Common {
 		/**
 		 * @brief Pass only message, if other properties cannot be specified.
 		 * @param Message Error description
-		 * @note Range will be set to empty [0, 0), requested index to 0
+		 * @note Range will be set to empty [0: 0), requested index to 0
 		*/
 		COutOfRange(const char* const Message)
 			: CException(Message) {};
@@ -66,7 +66,7 @@ namespace Common {
 		 * @brief Specifies valid range.
 		 * @return Pair of Min and Max+1 indexes, that were
 		 *		   available. Range: [First: Second)
-		 * @note Returns 0 Index with [0,0) range if constructed only
+		 * @note Returns 0 Index with [0: 0) range if constructed only
 		 *		 with message.
 		*/
 		virtual const TPair<size_t, size_t>& GetExpectedRange() const
@@ -77,7 +77,7 @@ namespace Common {
 		/**
 		 * @brief Index that caused this exception.
 		 * @return Value of index, that is not in expected range
-		 * @note Returns 0 Index with [0,0) range if constructed only
+		 * @note Returns 0 Index with [0: 0) range if constructed only
 		 *		 with message.
 		*/
 		virtual int GetRequestedIndex() const

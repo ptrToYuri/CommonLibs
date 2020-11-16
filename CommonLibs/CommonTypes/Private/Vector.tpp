@@ -1,5 +1,3 @@
-#include "..\Vector.h"
-
 namespace Common
 {
 
