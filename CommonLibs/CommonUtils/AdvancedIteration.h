@@ -3,16 +3,18 @@
 namespace Common 
 {
 
+	/**
+	 * @brief Counts elements between two iterators. Range: [Begin: End)
+	 * @tparam IteratorType Iterator with implemented ++, != and *
+	 * @param Begin Iterator referring to the first element
+	 * @param End Iterator referring to the element after last one
+	 * @return Distance between iterators
+	 * @note Begin must not be greater than end (negative results are
+	 *		 not supported)
+	*/
 	template <typename IteratorType>
-	unsigned int GetIteratorDistance(IteratorType Begin, IteratorType End)
-	{
-		unsigned int Distance = 0;
-		while (Begin != End)
-		{
-			++Begin;
-			++Distance;
-		}
-		return Distance;
-	}
+	size_t GetIteratorDistance(IteratorType Begin, IteratorType End);
 
 }
+
+#include "Private/AdvancedIteration.tpp"

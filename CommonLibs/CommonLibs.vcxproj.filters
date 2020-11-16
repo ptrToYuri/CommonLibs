@@ -38,8 +38,14 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CommonTypes\vector.tpp" />
-    <None Include="CommonTypes\Private\Vector.tpp" />
-    <None Include="CommonTypes\Private\VectorIterators.tpp" />
+    <None Include="CommonUtils\Private\AdvancedIteration.tpp">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="CommonTypes\Private\Vector.tpp">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="CommonTypes\Private\VectorIterators.tpp">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
