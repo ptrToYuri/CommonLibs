@@ -866,7 +866,7 @@ namespace Common
 			// if capacity exceeds 4*size and is
 			// not small, dealloc half of it. 
 			if (Capacity >= 4 * Size &&
-				Size >= 2 + 16 / sizeof(T))
+				Capacity >= 2 + 16 / sizeof(T))
 			{
 				Reallocate(Size, Size * 2);
 			}
