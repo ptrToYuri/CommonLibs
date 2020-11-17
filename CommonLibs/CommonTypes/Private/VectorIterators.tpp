@@ -255,7 +255,7 @@ namespace Common
 		{
 			if (InternalPointer + 1 == Owner->Buffer)
 			{
-				throw COutOfRange("Out of range: vector reverse iterator ++",
+				throw COutOfRange("Out of range: vector rev. iterator ++",
 					static_cast<int>(InternalPointer - Owner->Buffer),
 					TPair<size_t, size_t>(0, Owner->Size));
 			}
@@ -267,7 +267,7 @@ namespace Common
 		{
 			if (InternalPointer + 1 - Offset < Owner->Buffer)
 			{
-				throw COutOfRange("Out of range: vector reverse iterator +",
+				throw COutOfRange("Out of range: vector rev. iterator +",
 					static_cast<int>(InternalPointer + 1 - Owner->Buffer)
 					- static_cast<int>(Offset),
 					TPair<size_t, size_t>(0, Owner->Size));
@@ -279,7 +279,7 @@ namespace Common
 		{
 			if (InternalPointer + 1 - Offset < Owner->Buffer)
 			{
-				throw COutOfRange("Out of range: vector reverse iterator +=",
+				throw COutOfRange("Out of range: vector rev. iterator +=",
 					static_cast<int>(InternalPointer + 1 - Owner->Buffer)
 					- static_cast<int>(Offset),
 					TPair<size_t, size_t>(0, Owner->Size));
@@ -292,7 +292,7 @@ namespace Common
 		{
 			if (InternalPointer + 1 == Owner->Buffer + Owner->Size)
 			{
-				throw COutOfRange("Out of range: vector reverse iterator -- ",
+				throw COutOfRange("Out of range: vector rev. iterator --",
 					static_cast<int>(InternalPointer + 1 - Owner->Buffer),
 					TPair<size_t, size_t>(0, Owner->Size));
 			}
@@ -304,7 +304,7 @@ namespace Common
 		{
 			if (InternalPointer + 1 + Offset > Owner->Buffer + Owner->Size)
 			{
-				throw COutOfRange("Out of range: vector reverse iterator -",
+				throw COutOfRange("Out of range: vector rev. iterator -",
 					static_cast<int>(InternalPointer - Owner->Buffer)
 					+ static_cast<int>(Offset),
 					TPair<size_t, size_t>(0, Owner->Size));
@@ -316,7 +316,7 @@ namespace Common
 		{
 			if (InternalPointer + 1 + Offset > Owner->Buffer + Owner->Size)
 			{
-				throw COutOfRange("Out of range: vector reverse iterator -=",
+				throw COutOfRange("Out of range: vector rev. iterator -=",
 					static_cast<int>(InternalPointer - Owner->Buffer)
 					+ static_cast<int>(Offset),
 					TPair<size_t, size_t>(0, Owner->Size));

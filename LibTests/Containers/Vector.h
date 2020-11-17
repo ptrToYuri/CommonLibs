@@ -1,10 +1,11 @@
-// RUN IN DEBUG MODE!!
-
 #pragma once
+
+// RUN IN DEBUG MODE!!
 
 #include "../../CommonLibs/CommonTypes/Vector.h"
 #include "../../CommonLibs/CommonUtils/Assert.h"
 #include "../../CommonLibs/CommonTypes/Exception.h"
+#include "../../CommonLibs/CommonUtils/RawString.h"
 
 
 void VectorTestConstructors();

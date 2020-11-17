@@ -24,9 +24,6 @@
     <ClInclude Include="CommonUtils\AdvancedIteration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtils\Search.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CommonTypes\Optional.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -34,6 +31,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CommonTypes\Exception.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonUtils\RawString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,5 +47,10 @@
     <None Include="CommonTypes\Private\VectorIterators.tpp">
       <Filter>Source Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CommonUtils\Private\RawString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

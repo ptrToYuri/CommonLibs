@@ -328,56 +328,65 @@ void VectorTestIterators()
 
 	int ErrIndex = 1000;
 	size_t RangeMin = 1000, RangeMax = 1000;
-	try {
+	try
+	{
 		auto it = Third.SafeConstReverseBegin() + 6;
 	}
-	catch (const COutOfRange& Ex)
+	catch (const COutOfRange& Exception)
 	{
-		ErrIndex = Ex.GetRequestedIndex();
+		ErrIndex = Exception.GetRequestedIndex();
 	}
 	ASSERT(ErrIndex == -1, "Vector iterator error");
 
-	try {
+	try
+	{
 		auto it = Third.SafeConstReverseBegin() - 1;
 	}
-	catch (const COutOfRange& Ex)
+	catch (const COutOfRange& Exception)
 	{
-		ErrIndex = Ex.GetRequestedIndex();
+		ErrIndex = Exception.GetRequestedIndex();
 	}
 	ASSERT(ErrIndex == 5, "Vector iterator error");
 
-	try {
-		auto it = Third.SafeConstReverseEnd() + 1;
-	}
-	catch (const COutOfRange& Ex)
+	try
 	{
-		ErrIndex = Ex.GetRequestedIndex();
-		RangeMin = Ex.GetExpectedRange().First;
-		RangeMax = Ex.GetExpectedRange().Second;
+		auto it = ++Third.SafeConstReverseEnd();
+	}
+	catch (const COutOfRange& Exception)
+	{
+		ErrIndex = Exception.GetRequestedIndex();
+		RangeMin = Exception.GetExpectedRange().First;
+		RangeMax = Exception.GetExpectedRange().Second;
+		const char* const Message = Exception.GetMessage();
+		ASSERT(AreRawStringsEqual(Message,
+			"Out of range: vector rev. iterator ++"),
+			"Vector iterator error");
 	}
 	ASSERT(ErrIndex == -1 && RangeMin == 0 && RangeMax == 5,
 		"Vector iterator error");
 
-	try {
+	try
+	{
 		auto it = Third.SafeConstBegin() - 1;
 	}
-	catch (const COutOfRange& Ex)
+	catch (const COutOfRange& Exception)
 	{
-		ErrIndex = Ex.GetRequestedIndex();
-		RangeMin = Ex.GetExpectedRange().First;
-		RangeMax = Ex.GetExpectedRange().Second;
+		ErrIndex = Exception.GetRequestedIndex();
+		RangeMin = Exception.GetExpectedRange().First;
+		RangeMax = Exception.GetExpectedRange().Second;
 	}
 	ASSERT(ErrIndex == -1 && RangeMin == 0 && RangeMax == 5,
 		"Vector iterator error");
 
-	try {
+	try 
+	{
 		auto it = Third.SafeConstEnd() + 1;
 	}
-	catch (const COutOfRange& Ex)
+	catch (const COutOfRange& Exception)
 	{
-		ErrIndex = Ex.GetRequestedIndex();
-		RangeMin = Ex.GetExpectedRange().First;
-		RangeMax = Ex.GetExpectedRange().Second;
+		ErrIndex = Exception.GetRequestedIndex();
+		RangeMin = Exception.GetExpectedRange().First;
+		RangeMax = Exception.GetExpectedRange().Second;
 	}
 	ASSERT(ErrIndex == 5 && RangeMin == 0 && RangeMax == 5,
 		"Vector iterator error");

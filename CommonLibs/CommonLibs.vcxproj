@@ -40,13 +40,13 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -133,6 +133,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,17 +144,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CommonTypes\Exception.h" />
+    <ClInclude Include="CommonUtils\RawString.h" />
     <ClInclude Include="CommonTypes\Optional.h" />
     <ClInclude Include="CommonTypes\Pair.h" />
     <ClInclude Include="CommonUtils\AdvancedIteration.h" />
     <ClInclude Include="CommonUtils\Assert.h" />
     <ClInclude Include="CommonTypes\Vector.h" />
-    <ClInclude Include="CommonUtils\Search.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CommonTypes\Private\Vector.tpp" />
     <None Include="CommonTypes\Private\VectorIterators.tpp" />
     <None Include="CommonUtils\Private\AdvancedIteration.tpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CommonUtils\Private\RawString.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
