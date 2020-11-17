@@ -1,3 +1,5 @@
+// Yuri Zamyatin, 2020. This file is part of CommonLibs
+
 #pragma once
 
 // Impossible to implement these libs because they're parts

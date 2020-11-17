@@ -1,3 +1,5 @@
+// Yuri Zamyatin, 2020. This file is part of CommonLibs
+
 #pragma once
 
 #include "Pair.h"
@@ -13,8 +15,10 @@ namespace Common {
 
 		/**
 		 * @brief All exceptions must provide the message.
-		 * @param Message Error description. Will be copied to an inner buffer
-		 * @note If length of message > 40, first 40 symbols will be saved.
+		 * @param Message Error description. Will be copied
+		 *		  to an inner buffer
+		 * @note If length of message > 40, first 40 symbols
+		 *		 will be saved.
 		*/
 		CException(const char* const Message) noexcept
 		{
@@ -40,7 +44,8 @@ namespace Common {
 
 
 
-	/// Represents "Out of Range" error. Can hold message, requested and exected indices.
+	/// Represents "Out of Range" error. Can hold message,
+	/// requested and expected indices.
 	class COutOfRange : public CException
 	{
 
@@ -48,7 +53,7 @@ namespace Common {
 
 		/**
 		 * @brief Pass only message, if other properties cannot be specified.
-		 * @param Message Error description. Will be copied to an inner buffer
+		 * @param Message Description. Will be copied to an inner buffer
 		 * @note Range will be set to empty [0: 0), requested index to 0.
 		 * @note If length of message > 40, first 40 symbols will be saved.
 		*/
@@ -56,11 +61,11 @@ namespace Common {
 			: CException(Message) {};
 
 		/**
-		 * @brief Describes valid range and errored value. Also contains message.
-		 * @param Message Error description. Will be copied to an inner buffer
+		 * @brief Describes valid range and errored value. Contains message.
+		 * @param Message Description. Will be copied to an inner buffer
 		 * @param RequestedIndex Errored index (out of range).
-		 * @param ExpectedIndex Pair of Min and Max+1 indexes, that were available.
-		 *		  Range: [First: Second)
+		 * @param ExpectedIndex Pair of Min and Max+1 indexes, that were
+		 *		  available. Range: [First: Second)
 		 * @note If length of message > 40, first 40 symbols will be saved.
 		*/
 		COutOfRange(const char* const Message,
@@ -72,8 +77,8 @@ namespace Common {
 		 * @brief Specifies valid range.
 		 * @return Pair of Min and Max+1 indexes, that were
 		 *		   available. Range: [First: Second)
-		 * @note Returns 0 Index with [0: 0) range if constructed only
-		 *		 with message.
+		 * @note Returns 0 Index with [0: 0) range if constructed
+		 *		 only with message.
 		*/
 		virtual const TPair<size_t, size_t>& GetExpectedRange() const
 		{
@@ -83,8 +88,8 @@ namespace Common {
 		/**
 		 * @brief Index that caused this exception.
 		 * @return Value of index, that is not in expected range
-		 * @note Returns 0 Index with [0: 0) range if constructed only
-		 *		 with message.
+		 * @note Returns 0 Index with [0: 0) range if constructed
+		 *		 only with message.
 		*/
 		virtual int GetRequestedIndex() const
 		{
@@ -100,7 +105,7 @@ namespace Common {
 
 
 
-	/// Represents "Element does not exist" error (for e.g. in TPair). Stores message.
+	/// Represents "Element does not exist" error. Stores message.
 	class CDoesNotExist : public CException
 	{
 
@@ -108,7 +113,7 @@ namespace Common {
 
 		/**
 		 * @brief Pass only message, if other properties cannot be specified.
-		 * @param Message Error description. Will be copied to the inner buffer
+		 * @param Message Description. Will be copied to the inner buffer
 		 * @note If length of message > 40, first 40 symbols will be saved.
 		*/
 		CDoesNotExist(const char* const Message)

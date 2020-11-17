@@ -363,3 +363,6 @@ FodyWeavers.xsd
 
 # Temporarily
 Documentation/
+
+# Config for VS extension that does header-comments
+*.licenseheader

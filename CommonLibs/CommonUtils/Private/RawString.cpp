@@ -1,3 +1,5 @@
+// Yuri Zamyatin, 2020. This file is part of CommonLibs
+
 #include "../RawString.h"
 
 namespace Common
