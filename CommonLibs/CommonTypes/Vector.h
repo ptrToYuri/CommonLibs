@@ -79,11 +79,30 @@ namespace Common
 			CSafeConstReverseIterator;
 
 
-		/// Used to define how methods deal with Capacity.
+		/// Used to define how methods deal with Capacity. 
 		enum class EReservedCapacityRule : uint8_t
 		{
+			/**
+			 * [ADD] allocates (NewSize-1)*2 if capacity
+			 * exceed and vector is not small enough <br>
+			 * [DEL] allocates 2*Size if Capacity > 4 * Size
+			 * and vector is not small enough
+			*/
 			Exponential,
+
+			/**
+			 * [ADD] allocates NewSize + 3 + 32 / sizeof(T) if
+			 * capacity exceed <br>
+			 * [DEL] allocates Size + 4 + 32 / sizeof(T) if size
+			 * exceeds capacity by more than 2*(8 + 64 / sizeof(T))
+			*/
 			Linear,
+
+			/**
+			 * [ADD, DEL] memory is never reserved automatically; 
+			 * if true bAllowAutoShrink was passed into another
+			 * method, then ShrinkToFit() will be called
+			*/
 			NeverReserve
 		};
 
@@ -94,7 +113,7 @@ namespace Common
 		/**
 		 * @brief Creates empty vector with Capacity preset predefined.
 		 * @param CapacityRule Describes how memory will be reserved
-		 * @see SetCapacityRule() for more info about presets.
+		 * @see EReservedCapacityRule for more info about presets.
 		*/
 		TVector(EReservedCapacityRule CapacityRule) noexcept;
 
@@ -285,7 +304,7 @@ namespace Common
 		/**
 		 * @brief Removes one element from the end of vector.
 		 * @param bAllowAutoShrink Optional. Enables auto shrink
-		 *		  according to the capacity rule. See: SetCapacityRule()
+		 *		  according to the capacity rule. See: EReservedCapacityRule
 		 * @return Removed element (by value)
 		 * @note Vector must not be empty.
 		*/
@@ -298,7 +317,7 @@ namespace Common
 		 * @brief Removes N elements from the end of vector.
 		 * @param ElementsCount Number of elements to be removed
 		 * @param bAllowAutoShrink Optional. Enables auto shrink
-		 *		  according to the capacity rule. See: SetCapacityRule()
+		 *		  according to the capacity rule. See: EReservedCapacityRule
 		 * @note If ElementsCount >= Size, clears vector
 		*/
 		void PopMultiple(size_t ElementsCount,
@@ -307,7 +326,7 @@ namespace Common
 		/**
 		 * @brief Removes one element from the beginning of vector.
 		 * @param bAllowAutoShrink Optional. Enables auto shrink
-		 *		  according to the capacity rule. See: SetCapacityRule()
+		 *		  according to the capacity rule. See: EReservedCapacityRule
 		 * @return Removed element (by value)
 		*/
 		T Shift(bool bAllowAutoShrink = false);
@@ -318,8 +337,8 @@ namespace Common
 		/**
 		 * @brief Removes N elements from the beginning of vector.
 		 * @param ElementsCount Number of elements to be removed
-		 * @param bAllowAutoShrink Enables auto shrink
-		 *		  according to the capacity rule. See: SetCapacityRule()
+		 * @param bAllowAutoShrink Enables auto shrink according
+		 *		  to the capacity rule. See: EReservedCapacityRule
 		 * @note If ElementsCount >= Size, clears vector
 		*/
 		void ShiftMultiple(size_t ElementsCount,
@@ -328,8 +347,8 @@ namespace Common
 		/**
 		 * @brief Removes element with specified position.
 		 * @param Position Position of element to be removed
-		 * @param bAllowAutoShrink Enables auto shrink
-		 *		  according to the capacity rule. See: SetCapacityRule()
+		 * @param bAllowAutoShrink Enables auto shrink according
+		 *		  to the capacity rule. See: EReservedCapacityRule
 		 * @note If Position is greater than max index, does nothing.
 		 * @warning This method removes one element. To remove multiple,
 		 *			use EraseMultiple(). Your code with such a mistake
@@ -343,7 +362,7 @@ namespace Common
 		 * @param PositionTo End point for erase. Element with this index
 		 *		  will also be removed
 		 * @param bAllowAutoShrink Optional. Enables auto shrink
-		 *		  according to the capacity rule. See: SetCapacityRule()
+		 *		  according to the capacity rule. See: EReservedCapacityRule
 		 * @note Ignores elements at unavailable positions.
 		 * @warning This method removes multiple elements. To remove one,
 		 *			use Erase(). Your code with such a mistake will be
@@ -369,7 +388,7 @@ namespace Common
 		 *		  last elements. Otherwise, creates new with passed value.
 		 * @param DefaultValue Optional. Value to initialize added elements
 		 * @param bAllowAutoShrink Optional. Enables auto shrink
-		 *		  according to the capacity rule. See: SetCapacityRule()
+		 *		  according to the capacity rule. See: EReservedCapacityRule
 		*/
 		void Resize(size_t NewSize, const T& DefaultValue = {},
 			bool bAllowAutoShrink = false);
@@ -415,25 +434,9 @@ namespace Common
 		 *		  works when elements are added / removed from vertor.
 		 *		  Reallocation on removal happens only if bool
 		 *		  bAllowAutoShrink was passed with supported operation
-		 *
-		 * EReservedCapacityRule::Exponential - [ADD] allocates
-		 * (NewSize-1)*2 if capacity exceed & vector is not small;
-		 * [ERASE] allocates 2*Size if Capacity > 4 * Size and vector
-		 * is not small; <br>
-		 *
-		 * EReservedCapacityRule::Linear - [ADD] allocates
-		 * NewSize + 3 + 32 / sizeof(T) if capacity exceed;
-		 * [ERASE] allocates Size + 4 + 32 / sizeof(T) if size
-		 * exceeds capacity by more than 2*(8 + 64 / sizeof(T)) <br>
-		 *
-		 *
-		 * EReservedCapacityRule::NeverReserve - memory is never
-		 * reserved automatically; if bAllowAutoShrink was passed
-		 * into a method, then ShrinkToFit() is called immediately
-		 *
-		 * @param CapacityRule Enum value from the list above
+		 * @param CapacityRule Preset value from EReservedCapacityRule
 		 * @note If bAllowAutoShrink was passed with operation, size
-		 *		 that you manually reserved may also be deallocated
+		 *		 that you have manually reserved may also be deallocated
 		*/
 		void SetCapacityRule(EReservedCapacityRule CapacityRule) noexcept;
 
@@ -441,7 +444,7 @@ namespace Common
 		 * @brief Returns Capacity rule that is currently applied.
 		 *		  It affects how elements are allocated & destructed
 		 * @return EReservedCapacityRule Current capacity rule
-		 * @see SetCapacityRule() for more info about presets.
+		 * @see EReservedCapacityRule for more info about presets.
 		*/
 		EReservedCapacityRule GetCapacityRule() const noexcept;
 
