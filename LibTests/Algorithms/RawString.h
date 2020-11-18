@@ -4,8 +4,8 @@
 
 // RUN IN DEBUG MODE!!
 
-#include "../../CommonLibs/CommonUtils/RawString.h"
-#include "../../CommonLibs/CommonUtils/Assert.h"
+#include "CommonUtils/RawString.h"
+#include "CommonUtils/Assert.h"
 
 
 void RawStringTestLength();

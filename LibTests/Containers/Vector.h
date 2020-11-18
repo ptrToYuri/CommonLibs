@@ -4,10 +4,10 @@
 
 // RUN IN DEBUG MODE!!
 
-#include "../../CommonLibs/CommonTypes/Vector.h"
-#include "../../CommonLibs/CommonUtils/Assert.h"
-#include "../../CommonLibs/CommonTypes/Exception.h"
-#include "../../CommonLibs/CommonUtils/RawString.h"
+#include "CommonTypes/Vector.h"
+#include "CommonUtils/Assert.h"
+#include "CommonTypes/Exception.h"
+#include "CommonUtils/RawString.h"
 
 
 void VectorTestConstructors();
