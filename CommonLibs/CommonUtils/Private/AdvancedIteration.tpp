@@ -4,9 +4,10 @@ namespace Common
 {
 
 	template <typename IteratorType>
-	size_t GetIteratorDistance(IteratorType Begin, IteratorType End)
+	size_t GetIteratorDistance(IteratorType Begin,
+		const IteratorType End)
 	{
-		unsigned int Distance = 0;
+		size_t Distance = 0;
 		while (Begin != End)
 		{
 			++Begin;

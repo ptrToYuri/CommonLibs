@@ -31,7 +31,7 @@ namespace Common
 		*/
 		void MakePair(T1 First, T2 Second) noexcept
 		{
-			this.First = First;
+			this->First = First;
 			this->Second = Second;
 		}
 

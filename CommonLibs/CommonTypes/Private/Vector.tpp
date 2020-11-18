@@ -4,12 +4,12 @@ namespace Common
 {
 
 	template<typename T>
-	TVector<T>::TVector(EReservedCapacityRule CapacityRule) noexcept
+	TVector<T>::TVector(const EReservedCapacityRule CapacityRule) noexcept
 		: CapacityRule(CapacityRule) {};
 
 
 	template<typename T>
-	TVector<T>::TVector(size_t Size, const T& DefaultValue)
+	TVector<T>::TVector(const size_t Size, const T& DefaultValue)
 		: Size(Size), Capacity(Size)
 	{
 		if (!Size)
@@ -27,7 +27,7 @@ namespace Common
 
 
 	template<typename T>
-	TVector<T>::TVector(size_t Size, const T* const Array)
+	TVector<T>::TVector(const size_t Size, const T* const Array)
 		: Size(Size), Capacity(Size)
 	{
 		if (!Size)
@@ -58,7 +58,7 @@ namespace Common
 
 	template <typename T>
 	template <typename IteratorType>
-	TVector<T>::TVector(IteratorType Begin, IteratorType End,
+	TVector<T>::TVector(const IteratorType Begin, const IteratorType End,
 		// disable this constructor when it "wins" the first one
 		typename std::enable_if<!std::is_integral<
 		IteratorType>::value>::type*)
@@ -108,8 +108,8 @@ namespace Common
 
 	template<typename T>
 	template<typename IteratorType>
-	void TVector<T>::Assign(IteratorType Begin, IteratorType End,
-		bool bAllowAutoShrink)
+	void TVector<T>::Assign(const IteratorType Begin,
+		const IteratorType End, const bool bAllowAutoShrink)
 	{
 		Size = GetIteratorDistance(Begin, End);
 
@@ -188,7 +188,7 @@ namespace Common
 
 
 	template<typename T>
-	T& TVector<T>::operator [](size_t Index)
+	T& TVector<T>::operator [](const size_t Index)
 	{
 		ASSERT(Index < Size, "Out of range: [] vector");
 		return Buffer[Index];
@@ -196,7 +196,7 @@ namespace Common
 
 
 	template<typename T>
-	T& TVector<T>::SafeAt(size_t Index)
+	T& TVector<T>::SafeAt(const size_t Index)
 	{
 		if (Index >= Size)
 		{
@@ -209,7 +209,7 @@ namespace Common
 
 
 	template<typename T>
-	T& TVector<T>::AutoAt(size_t Index, const T& DefaultValue)
+	T& TVector<T>::AutoAt(const size_t Index, const T& DefaultValue)
 	{
 		if (Index >= Size)
 		{
@@ -271,7 +271,7 @@ namespace Common
 
 	template <typename T>
 	template <typename IteratorType>
-	void TVector<T>::Push(IteratorType Begin, IteratorType End)
+	void TVector<T>::Push(const IteratorType Begin, const IteratorType End)
 	{
 		size_t Distance = GetIteratorDistance(Begin, End);
 
@@ -288,7 +288,8 @@ namespace Common
 
 
 	template <typename T>
-	void TVector<T>::Insert(size_t Position, const T& Value, const T& FillOnResizeWith)
+	void TVector<T>::Insert(const size_t Position, const T& Value,
+		const T& FillOnResizeWith)
 	{
 		size_t FutureCapacity = Capacity; // update capacity after new as it may throw
 		if (Size >= Capacity || Position >= Capacity)
@@ -328,8 +329,8 @@ namespace Common
 
 	template <typename T>
 	template <typename IteratorType>
-	void TVector<T>::Insert(size_t Position, IteratorType Begin,
-		IteratorType End, const T& FillOnResizeWith,
+	void TVector<T>::Insert(const size_t Position, const IteratorType Begin,
+		const IteratorType End, const T& FillOnResizeWith,
 		// disable this constructor when it is not expected
 		typename std::enable_if<!std::is_integral<
 		IteratorType>::value>::type*)
@@ -379,7 +380,7 @@ namespace Common
 
 
 	template<typename T>
-	T TVector<T>::Pop(bool bAllowAutoShrink)
+	T TVector<T>::Pop(const bool bAllowAutoShrink)
 	{
 		ASSERT(Size, "Pop() operation on empty vector");
 
@@ -396,7 +397,7 @@ namespace Common
 
 
 	template<typename T>
-	T TVector<T>::SafePop(bool bAllowAutoShrink)
+	T TVector<T>::SafePop(const bool bAllowAutoShrink)
 	{
 		if (!Size)
 		{
@@ -408,7 +409,8 @@ namespace Common
 
 
 	template<typename T>
-	void TVector<T>::PopMultiple(size_t ElementsToPop, bool bAllowAutoShrink)
+	void TVector<T>::PopMultiple(const size_t ElementsToPop,
+		const bool bAllowAutoShrink)
 	{
 		if (ElementsToPop >= Size)
 		{
@@ -429,7 +431,7 @@ namespace Common
 
 
 	template<typename T>
-	T TVector<T>::Shift(bool bAllowAutoShrink)
+	T TVector<T>::Shift(const bool bAllowAutoShrink)
 	{
 		ASSERT(Size, "Shift() operation on empty vector");
 
@@ -448,7 +450,7 @@ namespace Common
 
 
 	template<typename T>
-	T TVector<T>::SafeShift(bool bAllowAutoShrink)
+	T TVector<T>::SafeShift(const bool bAllowAutoShrink)
 	{
 		if (!Size)
 		{
@@ -460,7 +462,8 @@ namespace Common
 
 
 	template<typename T>
-	void TVector<T>::ShiftMultiple(size_t ElementsToShift, bool bAllowAutoShrink)
+	void TVector<T>::ShiftMultiple(const size_t ElementsToShift,
+		const bool bAllowAutoShrink)
 	{
 		if (ElementsToShift >= Size)
 		{
@@ -482,7 +485,7 @@ namespace Common
 
 
 	template<typename T>
-	void TVector<T>::Erase(size_t Position, bool bAllowAutoShrink)
+	void TVector<T>::Erase(const size_t Position, const bool bAllowAutoShrink)
 	{
 		if (Position >= Size)
 		{
@@ -502,8 +505,8 @@ namespace Common
 	// note: different name was chosen intentionally to avoid implicit conversion
 	// of second parameter to boolean and deleting only one element
 	template<typename T>
-	void TVector<T>::EraseMultiple(size_t PositionFrom, size_t PositionTo,
-		bool bAllowAutoShrink)
+	void TVector<T>::EraseMultiple(const size_t PositionFrom,
+		size_t PositionTo, const bool bAllowAutoShrink)
 	{
 		if (PositionTo > Size)
 		{
@@ -528,7 +531,7 @@ namespace Common
 
 
 	template<typename T>
-	void TVector<T>::Reserve(size_t NewCapacity)
+	void TVector<T>::Reserve(const size_t NewCapacity)
 	{
 		if (NewCapacity >= Size)
 		{
@@ -545,8 +548,8 @@ namespace Common
 
 
 	template<typename T>
-	void TVector<T>::Resize(size_t NewSize, const T& DefaultValue,
-		bool bAllowAutoShrink)
+	void TVector<T>::Resize(const size_t NewSize, const T& DefaultValue,
+		const bool bAllowAutoShrink)
 	{
 		if (NewSize > Capacity)
 		{
@@ -644,7 +647,7 @@ namespace Common
 
 	template<typename T>
 	void TVector<T>::SetCapacityRule(
-		EReservedCapacityRule CapacityRule) noexcept
+		const EReservedCapacityRule CapacityRule) noexcept
 	{
 		this->CapacityRule = CapacityRule;
 	}
@@ -809,7 +812,7 @@ namespace Common
 
 
 	template<typename T>
-	size_t TVector<T>::CalcExtendedCapacity(size_t NewSize)
+	size_t TVector<T>::CalcExtendedCapacity(const size_t NewSize)
 	{
 		// no switch case for optimization
 		// as first condition is almost always true
@@ -828,7 +831,7 @@ namespace Common
 
 
 	template <typename T>
-	void TVector<T>::Reallocate(size_t OldSize, size_t NewCapacity)
+	void TVector<T>::Reallocate(const size_t OldSize, const size_t NewCapacity)
 	{
 		T* Temp = new T[NewCapacity];
 		Capacity = NewCapacity;
@@ -841,7 +844,7 @@ namespace Common
 
 
 	template<typename T>
-	inline T* TVector<T>::AllocateOrResetAndThrow(size_t NewCapacity)
+	inline T* TVector<T>::AllocateOrResetAndThrow(const size_t NewCapacity)
 	{
 		try {
 			return new T[NewCapacity];
@@ -894,7 +897,7 @@ namespace Common
 	template <typename T>
 	template <typename IteratorType>
 	void TVector<T>::CopyFromIterators(IteratorType Begin,
-		IteratorType End, T* outBuffer)
+		const IteratorType End, T* outBuffer)
 	{
 		size_t i = 0;
 		while (Begin != End)
@@ -907,7 +910,7 @@ namespace Common
 
 
 	template <typename T>
-	inline void TVector<T>::CopyFromArray(size_t Size,
+	inline void TVector<T>::CopyFromArray(const size_t Size,
 		const T* const ArrayFrom, T* outArrayTo)
 	{
 		for (size_t i = 0; i < Size; ++i)

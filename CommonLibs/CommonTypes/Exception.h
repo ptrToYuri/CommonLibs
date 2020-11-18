@@ -57,7 +57,7 @@ namespace Common {
 		 * @note Range will be set to empty [0: 0), requested index to 0.
 		 * @note If length of message > 40, first 40 symbols will be saved.
 		*/
-		COutOfRange(const char* const Message)
+		COutOfRange(const char* const Message) noexcept
 			: CException(Message) {};
 
 		/**
@@ -69,7 +69,8 @@ namespace Common {
 		 * @note If length of message > 40, first 40 symbols will be saved.
 		*/
 		COutOfRange(const char* const Message,
-			int RequestedIndex, const TPair<size_t, size_t>& ExpectedIndex)
+			int RequestedIndex,
+			const TPair<size_t, size_t>& ExpectedIndex) noexcept
 			: CException(Message), RequestedIndex(RequestedIndex),
 			ExpectedIndex(ExpectedIndex) {};
 
@@ -80,7 +81,7 @@ namespace Common {
 		 * @note Returns 0 Index with [0: 0) range if constructed
 		 *		 only with message.
 		*/
-		virtual const TPair<size_t, size_t>& GetExpectedRange() const
+		const TPair<size_t, size_t>& GetExpectedRange() const noexcept
 		{
 			return ExpectedIndex;
 		}
@@ -91,15 +92,15 @@ namespace Common {
 		 * @note Returns 0 Index with [0: 0) range if constructed
 		 *		 only with message.
 		*/
-		virtual int GetRequestedIndex() const
+		int GetRequestedIndex() const noexcept
 		{
 			return RequestedIndex;
 		}
 
 	protected:
 
-		int RequestedIndex = 0;
-		TPair<size_t, size_t> ExpectedIndex = { 0,0 };
+		const int RequestedIndex = 0;
+		const TPair<size_t, size_t> ExpectedIndex = { 0,0 };
 
 	};
 
@@ -116,7 +117,7 @@ namespace Common {
 		 * @param Message Description. Will be copied to the inner buffer
 		 * @note If length of message > 40, first 40 symbols will be saved.
 		*/
-		CDoesNotExist(const char* const Message)
+		CDoesNotExist(const char* const Message) noexcept
 			: CException(Message) {};
 
 	};
