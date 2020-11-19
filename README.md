@@ -12,7 +12,7 @@
 
 You can use headers, as it is specified in the documentation. IDE will set up include paths automatically.
 
-**This project is made for educational purposes only.**
+## This project is made for educational purposes only.
 Prefer using standard library as it is more stable and effective.
 
 Code is not finished yet. Please, open an issue if you find any bugs.
