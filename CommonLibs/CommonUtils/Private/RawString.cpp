@@ -67,11 +67,8 @@ namespace Common
 				return true;
 			}
 			++i;
-			if (NullTermString1[i] != NullTermString2[i])
-			{
-				return false;
-			}
 		}
+		return false;
 	}
 
 	bool AreRawStringsEqual(const char* const NullTermString1,
