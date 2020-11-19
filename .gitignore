@@ -361,7 +361,7 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# Temporarily
+# Generated documentation should be in separate place
 Documentation/
 
 # Config for VS extension that does header-comments

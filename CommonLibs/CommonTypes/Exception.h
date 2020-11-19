@@ -44,8 +44,7 @@ namespace Common {
 
 
 
-	/// Represents "Out of Range" error. Can hold message,
-	/// requested and expected indices.
+	/// Represents "Out of Range" error. Can hold message, requested and expected indices.
 	class COutOfRange : public CException
 	{
 
