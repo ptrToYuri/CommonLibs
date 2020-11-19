@@ -95,7 +95,10 @@ namespace Common
 	template<typename T>
 	TVector<T>::TVector(TVector<T>&& Other) noexcept
 		: Size(Other.Size), Capacity(Other.Capacity),
-		CapacityRule(Other.CapacityRule), Buffer(Other.Buffer) {};
+		CapacityRule(Other.CapacityRule), Buffer(Other.Buffer)
+	{
+		Other.Buffer = nullptr;
+	}
 
 
 	template<typename T>
@@ -181,6 +184,8 @@ namespace Common
 		Capacity = Other.Capacity;
 		CapacityRule = Other.CapacityRule;
 		Buffer = Other.Buffer;
+
+		Other.Buffer = nullptr;
 
 		return *this;
 	}
