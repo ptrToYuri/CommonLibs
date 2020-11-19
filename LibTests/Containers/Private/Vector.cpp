@@ -359,7 +359,7 @@ void VectorTestIterators()
 		ErrIndex = Exception.GetRequestedIndex();
 		RangeMin = Exception.GetExpectedRange().First;
 		RangeMax = Exception.GetExpectedRange().Second;
-		const char* const Message = Exception.GetMessage();
+		const char* Message = Exception.GetMessage();
 		ASSERT(AreRawStringsEqual(Message,
 			"Out of range: vector rev. iterator ++"),
 			"Vector iterator error");

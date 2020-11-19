@@ -44,7 +44,7 @@
     <None Include="CommonTypes\Private\Vector.tpp">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="CommonTypes\Private\VectorIterators.tpp">
+    <None Include="CommonTypes\Private\BlockIterator.tpp">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

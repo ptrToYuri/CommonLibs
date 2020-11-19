@@ -20,7 +20,7 @@ namespace Common {
 		 * @note If length of message > 40, first 40 symbols
 		 *		 will be saved.
 		*/
-		CException(const char* const Message) noexcept
+		CException(const char* Message) noexcept
 		{
 			CopyRawString(Message, this->Message, 40);
 		};
@@ -56,7 +56,7 @@ namespace Common {
 		 * @note Range will be set to empty [0: 0), requested index to 0.
 		 * @note If length of message > 40, first 40 symbols will be saved.
 		*/
-		COutOfRange(const char* const Message) noexcept
+		COutOfRange(const char* Message) noexcept
 			: CException(Message) {};
 
 		/**
@@ -67,7 +67,7 @@ namespace Common {
 		 *		  available. Range: [First: Second)
 		 * @note If length of message > 40, first 40 symbols will be saved.
 		*/
-		COutOfRange(const char* const Message,
+		COutOfRange(const char* Message,
 			int RequestedIndex,
 			const TPair<size_t, size_t>& ExpectedIndex) noexcept
 			: CException(Message), RequestedIndex(RequestedIndex),
@@ -116,7 +116,7 @@ namespace Common {
 		 * @param Message Description. Will be copied to the inner buffer
 		 * @note If length of message > 40, first 40 symbols will be saved.
 		*/
-		CDoesNotExist(const char* const Message) noexcept
+		CDoesNotExist(const char* Message) noexcept
 			: CException(Message) {};
 
 	};

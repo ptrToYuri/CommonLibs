@@ -11,7 +11,7 @@ namespace Common
 	 * @return Number of actual letters in string ('\0' is
 	 *		   not counted)
 	*/
-	size_t GetRawStringLength(const char* const NullTermString);
+	size_t GetRawStringLength(const char* NullTermString);
 
 	/**
 	 * @brief Calculates length of the C-string. Stops when null
@@ -24,7 +24,7 @@ namespace Common
 	 * @return Number of actual letters in string ('\0' is
 	 *		   not counted)
 	*/
-	size_t GetRawStringLength(const char* const NullTermString,
+	size_t GetRawStringLength(const char* NullTermString,
 		size_t MaxLength);
 
 
@@ -36,7 +36,7 @@ namespace Common
 	 *		  large enough to receive copied elements. May not
 	 *		  end with '\0'
 	*/
-	void CopyRawString(const char* const NullTermStringFrom,
+	void CopyRawString(const char* NullTermStringFrom,
 		char* const RawStringTo);
 
 	/**
@@ -52,8 +52,8 @@ namespace Common
 	 * @param MaxLength Max amount of characters to copy; does
 	 *		  not include trailing '\0'
 	*/
-	void CopyRawString(const char* const NullTermStringFrom,
-		char* const RawStringTo, size_t MaxLength);
+	void CopyRawString(const char* NullTermStringFrom,
+		char* RawStringTo, size_t MaxLength);
 
 
 	/**
@@ -63,8 +63,8 @@ namespace Common
 	 * @return true if characters before '\0' are the same
 	 *		   false otherwise
 	*/
-	bool AreRawStringsEqual(const char* const NullTermString1,
-		const char* const NullTermString2);
+	bool AreRawStringsEqual(const char* NullTermString1,
+		const char* NullTermString2);
 
 	/**
 	 * @brief Checks whether two C-style strings are equal.
@@ -79,6 +79,6 @@ namespace Common
 	 * @return true if characters before '\0' are the same
 	 *		   false otherwise
 	*/
-	bool AreRawStringsEqual(const char* const NullTermString1,
-		const char* const NullTermString2, size_t MaxCompareLength);
+	bool AreRawStringsEqual(const char* NullTermString1,
+		const char* NullTermString2, size_t MaxCompareLength);
 }
