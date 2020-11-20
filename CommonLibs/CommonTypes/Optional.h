@@ -69,8 +69,8 @@ namespace Common
 
 		/**
 		 * @brief Get value or passed value (if not possible)
-		 * @param OtherVariant 
-		 * @return Optional value or provided value 
+		 * @param OtherVariant
+		 * @return Optional value or provided value
 		*/
 		const T& GetValueOr(const T& OtherVariant) const noexcept
 		{
