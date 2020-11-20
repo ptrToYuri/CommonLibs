@@ -350,7 +350,7 @@ namespace Common
 		 * @param bAllowAutoShrink Enables auto shrink according
 		 *		  to the capacity rule. See: EReservedCapacityRule
 		 * @note If Position is greater than max index, does nothing.
-		 * @warning This method removes one element. To remove multiple,
+		 * @attention This method removes one element. To remove multiple,
 		 *			use EraseMultiple(). Your code with such a mistake
 		 *			will be compiled because of optional bool param.
 		*/
@@ -364,7 +364,7 @@ namespace Common
 		 * @param bAllowAutoShrink Optional. Enables auto shrink
 		 *		  according to the capacity rule. See: EReservedCapacityRule
 		 * @note Ignores elements at unavailable positions.
-		 * @warning This method removes multiple elements. To remove one,
+		 * @attention This method removes multiple elements. To remove one,
 		 *			use Erase(). Your code with such a mistake will be
 		 *			compiled because of optional bool param.
 		 *
@@ -406,8 +406,13 @@ namespace Common
 		*/
 		void ShrinkToFit();
 
-		/// Removes all elements from the vector
-		void Clear();
+		/**
+		 * @brief Removes all elements from the vector.
+		 * @param bDoForceDelete If set to true, will also update capacity.
+		 *		  otherwise, actual delete operation will not be called
+		 * @attention Set bool to true if you really want to free memory.
+		*/
+		void Clear(bool bDoFreeMemory = false);
 
 
 		/**

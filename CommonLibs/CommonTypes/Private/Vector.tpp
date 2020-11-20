@@ -419,17 +419,16 @@ namespace Common
 	{
 		if (ElementsToPop >= Size)
 		{
-			Clear();
+			Size = 0;
 		}
 		else
 		{
-
 			Size -= ElementsToPop;
+		}
 
-			if (bAllowAutoShrink)
-			{
-				AutoShrinkIfNeeded();
-			}
+		if (bAllowAutoShrink)
+		{
+			AutoShrinkIfNeeded();
 		}
 	}
 
@@ -472,18 +471,17 @@ namespace Common
 	{
 		if (ElementsToShift >= Size)
 		{
-			Clear();
+			Size = 0;
 		}
 		else
 		{
-
 			CopyFromArray(Size - ElementsToShift, Buffer + ElementsToShift, Buffer);
 			Size -= ElementsToShift;
+		}
 
-			if (bAllowAutoShrink)
-			{
-				AutoShrinkIfNeeded();
-			}
+		if (bAllowAutoShrink)
+		{
+			AutoShrinkIfNeeded();
 		}
 	}
 
@@ -546,7 +544,7 @@ namespace Common
 			}
 			else
 			{
-				Clear();
+				Clear(true);
 			}
 		}
 	}
@@ -614,18 +612,22 @@ namespace Common
 		}
 		else
 		{
-			Clear();
+			Clear(true);
 		}
 	}
 
 
 	template<typename T>
-	void TVector<T>::Clear()
+	void TVector<T>::Clear(bool bDoFreeMemory)
 	{
-		delete[] Buffer;
-		Buffer = nullptr;
 		Size = 0;
-		Capacity = 0;
+
+		if (bDoFreeMemory)
+		{
+			delete[] Buffer;
+			Buffer = nullptr;
+			Capacity = 0;
+		}
 	}
 
 
