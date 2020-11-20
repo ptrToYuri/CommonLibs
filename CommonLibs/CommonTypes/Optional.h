@@ -87,7 +87,7 @@ namespace Common
 
 	private:
 
-		T Value = T();
+		T Value = T{};
 		bool bExists = false;
 
 	};

@@ -37,10 +37,19 @@ namespace Common
 
 
 		/// First value in pair.
-		T1 First = T1();
+		T1 First = T1{};
 		/// Second value in pair.
-		T2 Second = T2();
+		T2 Second = T2{};
 
 	};
+
+
+
+	template <typename T1, typename T2>
+	inline TPair<T1, T2> MakePair(const T1& First,
+		const T2& Second) noexcept
+	{
+		return TPair<T1, T2>(First, Second);
+	}
 
 }

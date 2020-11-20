@@ -10,6 +10,9 @@ namespace Common
 
 	public:
 
+		TIterator()
+			: InternalPointer(nullptr) {}
+
 		TIterator(PointerType InitialPosition)
 			: InternalPointer(InitialPosition) {}
 
@@ -76,6 +79,9 @@ namespace Common
 	{
 
 	public:
+
+		TReverseIterator()
+			: InternalPointer(nullptr) {};
 
 		TReverseIterator(PointerType InitialPosition)
 			: InternalPointer(InitialPosition - 1) {};
