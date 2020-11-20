@@ -22,7 +22,7 @@ namespace Common
 		 * @param Value Object to create copy from
 		*/
 		TOptional(const T& Value) noexcept
-			: Value(T), bExists(true) {};
+			: Value(Value), bExists(true) {};
 
 
 		/**
@@ -43,6 +43,7 @@ namespace Common
 		TOptional<T>& operator = (const T& Value) noexcept
 		{
 			SetValue(Value);
+			return *this;
 		}
 
 		/**
@@ -69,7 +70,7 @@ namespace Common
 
 		/**
 		 * @brief Get value or passed value (if not possible)
-		 * @param OtherVariant
+		 * @param OtherVariant Returned if optional is empty
 		 * @return Optional value or provided value
 		*/
 		const T& GetValueOr(const T& OtherVariant) const noexcept
