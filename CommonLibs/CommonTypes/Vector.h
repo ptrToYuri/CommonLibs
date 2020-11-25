@@ -397,10 +397,9 @@ namespace Common
 
 		/**
 		 * @brief Swaps two vectors internally without deep copy.
-		 * @param Vector1 First vector
-		 * @param Vector2 Second vector
+		 * @param Other Object to swap resources with
 		*/
-		static void Swap(TVector<T>& Vector1, TVector<T>& Vector2) noexcept;
+		void Swap(TVector<T>& Other) noexcept;
 
 		/**
 		 * @brief Clears memory that was reserved for future use.

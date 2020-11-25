@@ -579,21 +579,21 @@ namespace Common
 
 
 	template<typename T>
-	void TVector<T>::Swap(TVector<T>& Vector1, TVector<T>& Vector2) noexcept
+	void TVector<T>::Swap(TVector<T>& Other) noexcept
 	{
 		size_t Temp;
 
-		Temp = Vector2.Size;
-		Vector2.Size = Vector1.Size;
-		Vector1.Size = Temp;
+		Temp = Other.Size;
+		Other.Size = Size;
+		Size = Temp;
 
-		Temp = Vector2.Capacity;
-		Vector2.Capacity = Vector1.Capacity;
-		Vector1.Capacity = Temp;
+		Temp = Other.Capacity;
+		Other.Capacity = Capacity;
+		Capacity = Temp;
 
-		T* TempBuffer = Vector2.Buffer;
-		Vector2.Buffer = Vector2.Buffer;
-		Vector1.Buffer = Temp;
+		T* TempBuffer = Other.Buffer;
+		Other.Buffer = Buffer;
+		Buffer = Temp;
 	}
 
 

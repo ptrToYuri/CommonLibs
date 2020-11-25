@@ -145,6 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Algorithms\Private\RawString.cpp" />
+    <ClCompile Include="Containers\Private\Optional.cpp" />
     <ClCompile Include="Containers\Private\Vector.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
@@ -152,6 +153,7 @@
     <ClInclude Include="Algorithms\All.h" />
     <ClInclude Include="Algorithms\RawString.h" />
     <ClInclude Include="Containers\All.h" />
+    <ClInclude Include="Containers\Optional.h" />
     <ClInclude Include="Containers\Vector.h" />
   </ItemGroup>
   <ItemGroup>

@@ -47,6 +47,7 @@
     <None Include="CommonTypes\Private\BlockIterator.tpp">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="CommonTypes\Private\Optional.tpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommonUtils\Private\RawString.cpp">

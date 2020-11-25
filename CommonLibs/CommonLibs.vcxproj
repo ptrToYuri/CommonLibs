@@ -161,6 +161,7 @@
     <ClInclude Include="CommonTypes\Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="CommonTypes\Private\Optional.tpp" />
     <None Include="CommonTypes\Private\Vector.tpp" />
     <None Include="CommonTypes\Private\BlockIterator.tpp" />
     <None Include="CommonUtils\Private\AdvancedIteration.tpp" />

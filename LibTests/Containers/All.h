@@ -3,8 +3,11 @@
 #pragma once
 
 #include "Vector.h"
+#include "Optional.h"
+
 
 inline void TestContainers()
 {
 	RunVectorTests();
+	RunOptionalTests();
 }
