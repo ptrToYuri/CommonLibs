@@ -5,7 +5,12 @@
 namespace Common
 {
 
-	/// Represents a pair of objects
+	/**
+	 * @brief Container that represents a pair of objects.
+	 * @note If the pair will be default-constucted, inner types
+	 *		 must also implement constructors with no params
+	 *		 
+	*/
 	template <typename T1, typename T2>
 	class TPair
 	{
