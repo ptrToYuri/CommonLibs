@@ -1,4 +1,4 @@
-// Yuri Zamyatin, 2020. This file is part of CommonLibs
+// Yuri Zamyatin, 2020-2021. This file is part of CommonLibs
 
 #pragma once
 
@@ -33,8 +33,6 @@ namespace Common
 	 *		 vector to be cleared (as you intended to remove old elements
 	 *		 anyway). If allocation fails in insertions, resize, push/pop,
 	 *		 etc. - vector will stay in the previous state.
-	 * @attention Containing type must provide a default (or empty)
-				  constructor. This will be fixed in the future.
 	*/
 	template <typename T>
 	class TVector

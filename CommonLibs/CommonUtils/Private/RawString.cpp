@@ -1,4 +1,4 @@
-// Yuri Zamyatin, 2020. This file is part of CommonLibs
+// Yuri Zamyatin, 2020-2021. This file is part of CommonLibs
 
 #include "../RawString.h"
 
