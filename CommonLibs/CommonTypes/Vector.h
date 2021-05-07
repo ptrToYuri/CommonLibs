@@ -9,6 +9,7 @@
 #include <new>	// rethrow std::bad_alloc
 
 #include "Exception.h"
+#include "Iterators/Block.h"
 #include "../CommonUtils/Assert.h"
 #include "../CommonUtils/AdvancedIteration.h"
 
@@ -38,44 +39,36 @@ namespace Common
 	class TVector
 	{
 
-	private:
-
-		// PointerType was introduced to avoid double implementation
-		// of const- and non-const iterators. Types are defined later
-		template <typename PointerType, typename ReferenceType>
-		class TIterator;
-		template <typename PointerType, typename ReferenceType>
-		class TReverseIterator;
-		template <typename PointerType, typename ReferenceType>
-		class TSafeIterator;
-		template <typename PointerType, typename ReferenceType>
-		class TSafeReverseIterator;
-
 	public:
 
-		/// Iterator. Implemented op-s: ++, +=, +, --, -=, -, ==, !=, =.
-		typedef TIterator<T*, T&> CIterator;
+		typedef T value_type;	// Following convention
 
+		/// Iterator. Implemented op-s: ++, +=, +, --, -=, -, ==, !=, =.
+		typedef Iterators::TBlockIterator<T*, T&> CIterator;
+		
 		/// Version of CIterator for const values.
-		typedef TIterator<const T*, const T&> CConstIterator;
+		typedef Iterators::TBlockIterator<const T*, const T&> CConstIterator;
 
 		/// Reverse iterator. Increment is actually decrement, etc.
-		typedef TReverseIterator<T*, T&> CReverseIterator;
+		typedef Iterators::TReverseBlockIterator<T*, T&> CReverseIterator;
 
 		/// Version of TReverseIterator for const values.
-		typedef TReverseIterator<const T*, const T&> CConstReverseIterator;
+		typedef Iterators::TReverseBlockIterator<const T*, const T&>
+			CConstReverseIterator;
 
 		/// Iterator that does bounds checking and throws OutOfRange().
-		typedef TSafeIterator<T*, T&> CSafeIterator;
+		typedef Iterators::TSafeBlockIterator<T*, T&, TVector<T>*> CSafeIterator;
 
 		/// Version of TSafeIterator for const values.
-		typedef TSafeIterator<const T*, const T&> CSafeConstIterator;
+		typedef Iterators::TSafeBlockIterator<const T*, const T&, const  TVector<T>*>
+			CSafeConstIterator;
 
 		/// Reverse iterator that can throw OutOfRange().
-		typedef TSafeReverseIterator<T*, T&> CSafeReverseIterator;
+		typedef Iterators::TSafeReverseBlockIterator<T*, T&, TVector<T>*>
+			CSafeReverseIterator;
 
 		/// Version of TSafeReverseIterator for const values.
-		typedef TSafeReverseIterator<const T*, const T&>
+		typedef Iterators::TSafeReverseBlockIterator<const T*, const T&, const TVector<T>*>
 			CSafeConstReverseIterator;
 
 
@@ -99,7 +92,7 @@ namespace Common
 			Linear,
 
 			/**
-			 * [ADD, DEL] memory is never reserved automatically; 
+			 * [ADD, DEL] memory is never reserved automatically;
 			 * if true bAllowAutoShrink was passed into another
 			 * method, then ShrinkToFit() will be called
 			*/
@@ -210,14 +203,18 @@ namespace Common
 
 		/// Index operator for const vectors.
 		const T& operator [] (size_t Index) const
-			{ return const_cast<TVector<T>*>(this)->operator[](Index); }
+		{
+			return const_cast<TVector<T>*>(this)->operator[](Index);
+		}
 
 		/// [] with range check.
 		T& SafeAt(size_t Index);
 
 		// SafeAt() for const vectors.
 		const T& SafeAt(size_t Index) const
-			{ return const_cast<TVector<T>*>(this)->SafeAt(Index); }
+		{
+			return const_cast<TVector<T>*>(this)->SafeAt(Index);
+		}
 
 		/**
 		 * @brief If element does not exist, this will resize vector and
@@ -238,7 +235,9 @@ namespace Common
 
 		/// RawData() for const vectors.
 		const T* RawData() const noexcept
-			{ return const_cast<TVector<T>*>(this)->RawData(); }
+		{
+			return const_cast<TVector<T>*>(this)->RawData();
+		}
 
 
 		/**
@@ -462,14 +461,18 @@ namespace Common
 
 		/// Front() for const vectors.
 		const T& Front() const
-			{ return const_cast<TVector<T>*>(this)->Front(); }
+		{
+			return const_cast<TVector<T>*>(this)->Front();
+		}
 
 		/// Front() with range check.
 		T& SafeFront();
 
 		/// SafeFront() for const vectors.
 		const T& SafeFront() const
-			{ return const_cast<TVector<T>*>(this)->SafeFront(); }
+		{
+			return const_cast<TVector<T>*>(this)->SafeFront();
+		}
 
 
 		/**
@@ -481,14 +484,18 @@ namespace Common
 
 		/// Back() for const vectors.
 		const T& Back() const
-			{ return const_cast<TVector<T>*>(this)->Back(); }
+		{
+			return const_cast<TVector<T>*>(this)->Back();
+		}
 
 		/// Back() with range check.
 		T& SafeBack();
 
 		/// SafeBack() for const vectors.
 		const T& SafeBack() const
-			{ return const_cast<TVector<T>*>(this)->SafeBack(); }
+		{
+			return const_cast<TVector<T>*>(this)->SafeBack();
+		}
 
 
 		/**
@@ -622,20 +629,35 @@ namespace Common
 		T* Buffer = nullptr;		// storage
 		EReservedCapacityRule CapacityRule =  // capacity management
 			EReservedCapacityRule::Exponential;
-
-		inline size_t CalcExtendedCapacity(size_t NewSize);
+		
+		inline T* Allocate(size_t NewSize);
+		inline void Deallocate(T* Buffer) noexcept;
+		inline void Construct(size_t Index, T* Buffer, T& value = {});
+		inline void Destruct(size_t Index, T* Buffer) noexcept;
+		inline void DestructAll(size_t Size, T* Buffer) noexcept;
+		
+		size_t CalcExtendedCapacity(size_t NewSize);
 		void Reallocate(size_t OldSize, size_t NewCapacity);
-		inline T* AllocateOrResetAndThrow(size_t NewCapacity);
+		T* AllocateOrResetAndThrow(size_t NewCapacity);
 		void AutoShrinkIfNeeded();
 
 		template <typename IteratorType>
-		inline void CopyFromIterators(IteratorType Begin,
+		void CopyFromIterators(IteratorType Begin,
 			IteratorType End, T* Buffer);
-		inline void CopyFromArray(size_t Size, const T* const Array1, T* Array2);
+		void CopyFromArray(size_t Size, const T* const Array1, T* Array2);
+
+		friend CIterator;
+		friend CConstIterator;
+		friend CReverseIterator;
+		friend CConstReverseIterator;
+		friend CSafeIterator;
+		friend CSafeConstIterator;
+		friend CSafeReverseIterator;
+		friend CSafeConstReverseIterator;
 
 	};
 
 }
 
-#include "Private/BlockIterator.tpp"
-#include "Private/Vector.tpp"
+#include "Private/Vector/Vector.tpp"
+#include "Private/Vector/Allocation.tpp"

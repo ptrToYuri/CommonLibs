@@ -22,7 +22,7 @@ namespace Common {
 		*/
 		CException(const char* Message) noexcept
 		{
-			CopyRawString(Message, this->Message, 40);
+			CopyRawString(Message, this->Message, 47);
 		};
 
 		virtual ~CException() {}
@@ -39,7 +39,7 @@ namespace Common {
 
 	protected:
 
-		char Message[41];
+		char Message[48];
 	};
 
 

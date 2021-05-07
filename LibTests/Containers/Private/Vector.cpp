@@ -353,6 +353,7 @@ void VectorTestIterators()
 	try
 	{
 		auto it = ++Third.SafeConstReverseEnd();
+		ASSERT(false, "Vector iterator error");
 	}
 	catch (const COutOfRange& Exception)
 	{
@@ -361,7 +362,7 @@ void VectorTestIterators()
 		RangeMax = Exception.GetExpectedRange().Second;
 		const char* Message = Exception.GetMessage();
 		ASSERT(AreRawStringsEqual(Message,
-			"Out of range: vector rev. iterator ++"),
+			"Out of range: vector rev. BlockIterator ++"),
 			"Vector iterator error");
 	}
 	ASSERT(ErrIndex == -1 && RangeMin == 0 && RangeMax == 5,

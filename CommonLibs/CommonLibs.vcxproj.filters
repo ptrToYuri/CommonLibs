@@ -36,18 +36,26 @@
     <ClInclude Include="CommonUtils\RawString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CommonTypes\Iterators\Block.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonUtils\Allocation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommonUtils\Private\AdvancedIteration.tpp">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="CommonTypes\Private\Vector.tpp">
+    <None Include="CommonTypes\Private\Vector\Vector.tpp">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="CommonTypes\Private\BlockIterator.tpp">
+    <None Include="CommonTypes\Private\Iterators\Block.tpp">
       <Filter>Source Files</Filter>
     </None>
     <None Include="CommonTypes\Private\Optional.tpp" />
+    <None Include="CommonUtils\Private\Allocation.tpp" />
+    <None Include="CommonTypes\Private\Vector\Allocation.tpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommonUtils\Private\RawString.cpp">

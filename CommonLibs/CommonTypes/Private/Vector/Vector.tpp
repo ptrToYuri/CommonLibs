@@ -104,6 +104,10 @@ namespace Common
 	template<typename T>
 	TVector<T>::~TVector()
 	{
+		for (size_t i = 0; i < Size; ++i)
+		{
+			reinterpret_cast<T*>(Buffer)->~T();
+		}
 		delete[] Buffer;
 	}
 
@@ -741,7 +745,7 @@ namespace Common
 	template<typename T>
 	typename TVector<T>::CSafeIterator TVector<T>::SafeBegin()
 	{
-		return CSafeIterator(Buffer);
+		return CSafeIterator(Buffer, this);
 	}
 
 	template<typename T>
@@ -818,6 +822,7 @@ namespace Common
 	}
 
 
+
 	template<typename T>
 	size_t TVector<T>::CalcExtendedCapacity(const size_t NewSize)
 	{
@@ -851,7 +856,7 @@ namespace Common
 
 
 	template<typename T>
-	inline T* TVector<T>::AllocateOrResetAndThrow(const size_t NewCapacity)
+	T* TVector<T>::AllocateOrResetAndThrow(const size_t NewCapacity)
 	{
 		try {
 			return new T[NewCapacity];
@@ -917,7 +922,7 @@ namespace Common
 
 
 	template <typename T>
-	inline void TVector<T>::CopyFromArray(const size_t Size,
+	void TVector<T>::CopyFromArray(const size_t Size,
 		const T* const ArrayFrom, T* outArrayTo)
 	{
 		for (size_t i = 0; i < Size; ++i)
