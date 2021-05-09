@@ -154,13 +154,13 @@
   <ItemGroup>
     <ClInclude Include="CommonTypes\Exception.h" />
     <ClInclude Include="CommonTypes\Iterators\Block.h" />
-    <ClInclude Include="CommonUtils\Allocation.h" />
     <ClInclude Include="CommonUtils\RawString.h" />
     <ClInclude Include="CommonTypes\Optional.h" />
     <ClInclude Include="CommonTypes\Pair.h" />
     <ClInclude Include="CommonUtils\AdvancedIteration.h" />
     <ClInclude Include="CommonUtils\Assert.h" />
     <ClInclude Include="CommonTypes\Vector.h" />
+    <ClInclude Include="CommonUtils\TypeOperations.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CommonTypes\Private\Optional.tpp" />
@@ -168,7 +168,7 @@
     <None Include="CommonTypes\Private\Vector\Vector.tpp" />
     <None Include="CommonTypes\Private\Iterators\Block.tpp" />
     <None Include="CommonUtils\Private\AdvancedIteration.tpp" />
-    <None Include="CommonUtils\Private\Allocation.tpp" />
+    <None Include="CommonUtils\Private\TypeOperations.tpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommonUtils\Private\RawString.cpp" />

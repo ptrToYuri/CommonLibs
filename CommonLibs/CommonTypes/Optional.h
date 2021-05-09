@@ -9,6 +9,7 @@
 #include <new>	// placement new language feature
 
 #include "Exception.h"
+#include "./../CommonUtils/TypeOperations.h"	// Move, Swap
 
 namespace Common
 {
@@ -121,8 +122,6 @@ namespace Common
 		inline void Construct(const T& Value);
 		inline void DestructIfExists() noexcept;
 		inline const T& Get() const noexcept;
-		inline void CopyValueMemory(const TOptional<T>&
-			From) const noexcept;
 
 	};
 

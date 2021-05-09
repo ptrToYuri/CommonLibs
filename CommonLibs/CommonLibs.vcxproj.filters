@@ -39,7 +39,7 @@
     <ClInclude Include="CommonTypes\Iterators\Block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtils\Allocation.h">
+    <ClInclude Include="CommonUtils\TypeOperations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -54,8 +54,8 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="CommonTypes\Private\Optional.tpp" />
-    <None Include="CommonUtils\Private\Allocation.tpp" />
     <None Include="CommonTypes\Private\Vector\Allocation.tpp" />
+    <None Include="CommonUtils\Private\TypeOperations.tpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommonUtils\Private\RawString.cpp">

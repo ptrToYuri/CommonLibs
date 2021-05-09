@@ -28,8 +28,7 @@ namespace Common
 		bExists = Other.bExists;
 		if (bExists)
 		{
-			CopyValueMemory(Other);
-			Other.bExists = false;
+			Construct(Move(Other.Get()));
 		}
 	}
 
@@ -86,7 +85,7 @@ namespace Common
 		DestructIfExists();
 		if (Other.bExists)
 		{
-			CopyValueMemory(Other);
+			Construct(Move(Other.Get()));
 		}
 		bExists = Other.bExists;
 		return *this;
@@ -96,10 +95,7 @@ namespace Common
 	template<typename T>
 	void TOptional<T>::Swap(TOptional<T>& Other)
 	{
-		// copy as POD
-		TOptional Temp = Other;
-		Other = *this;
-		*this = Temp;
+		::Swap(Other, *this);
 	}
 
 
@@ -177,17 +173,6 @@ namespace Common
 	inline const T& TOptional<T>::Get() const noexcept
 	{
 		return *reinterpret_cast<const T*>(Buffer);
-	}
-
-
-	template<typename T>
-	inline void TOptional<T>::CopyValueMemory(const TOptional<T>&
-		 From) const noexcept
-	{
-		for (int i = 0; i < sizeof(T); ++i)
-		{
-			Buffer[i] = From.Buffer[i];
-		}
 	}
 
 }
