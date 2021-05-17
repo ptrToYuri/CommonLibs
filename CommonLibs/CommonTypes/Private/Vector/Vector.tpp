@@ -18,7 +18,7 @@ namespace Common
 			return;
 		}
 
-		Buffer = Allocate(Capacity);
+		Allocate(Capacity, Buffer);
 		SafeFillConstruct(0, Capacity, Buffer, T{});
 		this->Size = Capacity;
 	};
@@ -34,7 +34,7 @@ namespace Common
 			return;
 		}
 
-		Buffer = Allocate(Capacity);
+		Allocate(Capacity, Buffer);
 		SafeFillConstruct(0, Size, Buffer, DefaultValue);
 		this->Size = Size;
 	}
@@ -50,7 +50,7 @@ namespace Common
 			return;
 		}
 
-		Buffer = Allocate(Capacity);
+		Allocate(Capacity, Buffer);
 		SafeBulkConstruct(0, Array, Array + Size, Buffer);
 		this->Size = Size;
 	}
@@ -65,7 +65,7 @@ namespace Common
 			return;
 		}
 
-		Buffer = Allocate(Capacity);
+		Allocate(Capacity, Buffer);
 		SafeBulkConstruct(0, ValuesList.begin(), ValuesList.end(), Buffer);
 		Size = Capacity;
 	}
@@ -87,7 +87,7 @@ namespace Common
 			return;
 		}
 
-		Buffer = Allocate(Capacity);
+		Allocate(Capacity, Buffer);
 		SafeBulkConstruct(0, Begin, End, Buffer);
 		Size = Capacity;
 	}
@@ -103,7 +103,7 @@ namespace Common
 			return;
 		}
 
-		Buffer = Allocate(Capacity);
+		Allocate(Capacity, Buffer);
 		SafeBulkConstruct(0, Other.Buffer, Other.Buffer + Other.Size, Buffer);
 		Size = Other.Size;
 	}
@@ -133,7 +133,8 @@ namespace Common
 		size_t NewSize = GetIteratorDistance(Begin, End);
 		size_t NewCapacity = CalcExtendedCapacity(NewSize);
 
-		T* TempBuffer = Allocate(NewCapacity);
+		T* TempBuffer;
+		Allocate(NewCapacity, TempBuffer);
 		try
 		{
 			SafeBulkConstruct(0, Begin, End, TempBuffer);
@@ -167,7 +168,8 @@ namespace Common
 	{
 		size_t NewSize = Other.Size;
 
-		T* TempBuffer = Allocate(Other.Capacity);
+		T* TempBuffer;
+		Allocate(Other.Capacity, TempBuffer);
 		try
 		{
 			SafeBulkConstruct(0, Other.Buffer,
@@ -275,11 +277,11 @@ namespace Common
 
 
 	template<typename T>
-	TVector<T> TVector<T>::operator + (const TVector<T>& Other)
+	TVector<T> TVector<T>::operator + (const TVector<T>& Other) const
 	{
 		size_t NewSize = Size + Other.Size;
 		TVector<T> NewVector;
-		NewVector.Buffer = Allocate(NewSize);
+		Allocate(NewSize, NewVector.Buffer);
 		NewVector.Capacity = NewSize;
 
 		SafeBulkConstruct(0, Buffer, Buffer + Size, NewVector.Buffer);

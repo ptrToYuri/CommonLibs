@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="CommonTypes\Exception.h" />
     <ClInclude Include="CommonTypes\Iterators\Block.h" />
+    <ClInclude Include="CommonUtils\BlockAllocation.h" />
     <ClInclude Include="CommonUtils\RawString.h" />
     <ClInclude Include="CommonTypes\Optional.h" />
     <ClInclude Include="CommonTypes\Pair.h" />
@@ -164,11 +165,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CommonTypes\Private\Optional.tpp" />
-    <None Include="CommonTypes\Private\Vector\Allocation.tpp" />
     <None Include="CommonTypes\Private\Vector\Iterator.tpp" />
     <None Include="CommonTypes\Private\Vector\Vector.tpp" />
     <None Include="CommonTypes\Private\Iterators\Block.tpp" />
     <None Include="CommonUtils\Private\AdvancedIteration.tpp" />
+    <None Include="CommonUtils\Private\BlockAllocation.tpp" />
     <None Include="CommonUtils\Private\TypeOperations.tpp" />
   </ItemGroup>
   <ItemGroup>

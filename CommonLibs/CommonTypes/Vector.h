@@ -5,14 +5,14 @@
 // Impossible to implement these libs because they're parts
 // of the C++ compiler
 #include <initializer_list>	// smart initialization syntax
-#include <type_traits>	// tweaking the priority of overloaded methods
-#include <new>	// rethrow std::bad_alloc
+#include <type_traits>
 
 #include "Exception.h"
 #include "Iterators/Block.h"
 #include "../CommonUtils/Assert.h"
 #include "./../CommonUtils/TypeOperations.h"	// Move, Swap
-#include "../CommonUtils/AdvancedIteration.h"
+#include "./../CommonUtils/AdvancedIteration.h"	// Distance
+#include "./../CommonUtils/BlockAllocation.h"	// Allocate, construct, ...
 
 namespace Common
 {
@@ -290,7 +290,7 @@ namespace Common
 
 		TVector<T>& operator += (TVector<T>& Other);
 
-		TVector<T> operator + (const TVector<T>& Other);
+		TVector<T> operator + (const TVector<T>& Other) const;
 
 
 		/**
@@ -695,24 +695,6 @@ namespace Common
 		EReservedCapacityRule CapacityRule =  // capacity management
 			EReservedCapacityRule::Exponential;
 
-		inline T* Allocate(size_t NewSize);
-		inline void Deallocate(T*& OutBuffer) noexcept;
-		inline void Construct(size_t Index, T* OutBuffer, const T& Value);
-		inline void Destruct(size_t Index, T* OutBuffer) noexcept;
-		inline void DestructRange(size_t From, size_t To, 
-			T* OutBuffer) noexcept;	// [From; To)
-		inline void DestructAll(size_t Size, T* OutBuffer) noexcept;
-
-		void SafeMoveBlock(size_t Size, T* FromBuffer, T* ToBuffer);
-		void SafeMoveBlockReverse(size_t Size, T* FromBuffer, T* ToBuffer);
-		void Reconstruct(size_t CopySize, size_t NewCapacity,
-			T*& OutBuffer, size_t& OutCapacity, size_t& OutSize);
-		template <typename IteratorType>
-		void SafeBulkConstruct(size_t StartPosition, IteratorType From, 
-			IteratorType To, T* OutBuffer);
-		void SafeFillConstruct(size_t StartPosition, size_t EndPosition,
-			T* OutBuffer, const T& Value);
-
 		size_t CalcExtendedCapacity(size_t NewSize);
 		void AutoShrinkIfNeeded(EShrinkBehavior ShrinkBehavior);
 
@@ -731,5 +713,4 @@ namespace Common
 }
 
 #include "Private/Vector/Vector.tpp"
-#include "Private/Vector/Allocation.tpp"
 #include "Private/Vector/Iterator.tpp"

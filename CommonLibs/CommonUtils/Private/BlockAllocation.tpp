@@ -4,11 +4,11 @@ namespace Common
 {
 
 	template<typename T>
-	inline T* TVector<T>::Allocate(const size_t AllocSize)
+	inline void Allocate(const size_t AllocSize, T*& OutBuffer)
 	{
 		try
 		{
-			return reinterpret_cast<T*>(::operator new (sizeof(T) * AllocSize));
+			OutBuffer = reinterpret_cast<T*>(::operator new (sizeof(T) * AllocSize));
 		}
 		catch (...)		// use own exception system
 		{
@@ -18,7 +18,7 @@ namespace Common
 
 
 	template<typename T>
-	inline void TVector<T>::Deallocate(T*& OutBuffer) noexcept
+	inline void Deallocate(T*& OutBuffer) noexcept
 	{
 		::operator delete[](OutBuffer);
 		OutBuffer = nullptr;
@@ -26,7 +26,7 @@ namespace Common
 
 
 	template<typename T>
-	inline void TVector<T>::Construct(const size_t Index, T* const OutBuffer,
+	inline void Construct(const size_t Index, T* const OutBuffer,
 		const T& Value)
 	{
 		new (OutBuffer + Index) T(Value);
@@ -34,15 +34,16 @@ namespace Common
 
 
 	template<typename T>
-	inline void TVector<T>::Destruct(const size_t Index,
+	inline void Destruct(const size_t Index,
 		T* const OutBuffer) noexcept
 	{
 		OutBuffer[Index].~T();
 	}
 
 
+
 	template<typename T>
-	inline void TVector<T>::DestructRange(const size_t From, const size_t To,
+	inline void DestructRange(const size_t From, const size_t To,
 		T* const OutBuffer) noexcept
 	{
 		for (size_t i = From; i < To; ++i) {
@@ -52,15 +53,16 @@ namespace Common
 
 
 	template<typename T>
-	inline void TVector<T>::DestructAll(const size_t Size,
+	inline void DestructAll(const size_t Size,
 		T* const OutBuffer) noexcept
 	{
 		DestructRange(0, Size, OutBuffer);
 	}
 
 
+
 	template<typename T>
-	void TVector<T>::SafeMoveBlock(const size_t Size,
+	void SafeMoveBlock(const size_t Size,
 		T* const FromBuffer, T* const ToBuffer)
 	{
 		size_t i = 0;
@@ -82,7 +84,7 @@ namespace Common
 
 
 	template<typename T>
-	void TVector<T>::SafeMoveBlockReverse(const size_t Size,
+	void SafeMoveBlockReverse(const size_t Size,
 		T* const FromBuffer, T* const ToBuffer)
 	{
 		size_t i = Size;
@@ -104,10 +106,11 @@ namespace Common
 
 
 	template<typename T>
-	void TVector<T>::Reconstruct(size_t CopySize, size_t AllocSize,
+	void Reconstruct(size_t CopySize, size_t AllocSize,
 		T*& OutBuffer, size_t& OutCopySize, size_t& OutAllocSize)
 	{
-		T* TempBuffer = Allocate(AllocSize);
+		T* TempBuffer;
+		Allocate(AllocSize, TempBuffer);
 		try
 		{
 			SafeMoveBlock(CopySize, OutBuffer, TempBuffer);
@@ -127,9 +130,8 @@ namespace Common
 	}
 
 
-	template<typename T>
-	template<typename IteratorType>
-	void TVector<T>::SafeBulkConstruct(const size_t StartPosition,
+	template<typename IteratorType, typename T>
+	void SafeBulkConstruct(const size_t StartPosition,
 		const IteratorType Begin, const IteratorType End, T* const OutBuffer)
 	{
 		size_t i = StartPosition;
@@ -150,7 +152,7 @@ namespace Common
 
 
 	template<typename T>
-	void TVector<T>::SafeFillConstruct(const size_t StartPosition,
+	void SafeFillConstruct(const size_t StartPosition,
 		const size_t EndPosition, T* const OutBuffer, const T& Value)
 	{
 		size_t i = StartPosition;
