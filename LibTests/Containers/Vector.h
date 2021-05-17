@@ -25,6 +25,7 @@ void VectorTestConst();
 inline void RunVectorTests()
 {
 	VectorTestConstructors();
+	VectorTestOperators();
 	VectorTestAssignment();
 	VectorTestPushPopShift();
 	VectorTestInsert();

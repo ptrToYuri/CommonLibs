@@ -266,6 +266,31 @@ namespace Common
 	}
 
 
+	template<typename T>
+	TVector<T>& TVector<T>::operator += (TVector<T>& Other)
+	{
+		Push(Other.Buffer, Other.Buffer + Other.Size);
+		return *this;
+	}
+
+
+	template<typename T>
+	TVector<T> TVector<T>::operator + (const TVector<T>& Other)
+	{
+		size_t NewSize = Size + Other.Size;
+		TVector<T> NewVector;
+		NewVector.Buffer = Allocate(NewSize);
+		NewVector.Capacity = NewSize;
+
+		SafeBulkConstruct(0, Buffer, Buffer + Size, NewVector.Buffer);
+		NewVector.Size = Size;
+		SafeBulkConstruct(Size, Other.Buffer, Other.Buffer + Other.Size, 
+			NewVector.Buffer);
+		NewVector.Size = NewSize;
+
+		return NewVector;
+	}
+
 
 	template <typename T>
 	void TVector<T>::Push(const T& Value)
@@ -340,7 +365,7 @@ namespace Common
 		// Note: clears vector if Move construction fails
 		try
 		{
-			SafeMoveBlockReverse(Size-Position, Buffer + Position,
+			SafeMoveBlockReverse(Size - Position, Buffer + Position,
 				Buffer + Position + Distance);
 		}
 		catch (...)
@@ -435,7 +460,7 @@ namespace Common
 		}
 		try
 		{
-			T PopValue(Move(Buffer[Size-1]));	// may throw
+			T PopValue(Move(Buffer[Size - 1]));	// may throw
 			Pop(ShrinkBehavior);
 			return PopValue;
 		}
@@ -699,7 +724,9 @@ namespace Common
 	template<typename T>
 	void TVector<T>::Swap(TVector<T>& Other) noexcept
 	{
-		::Swap(Other, *this);
+		::Swap(Other.Buffer, this->Buffer);
+		::Swap(Other.Capacity, this->Capacity);
+		::Swap(Other.Size, this->Size);
 	}
 
 

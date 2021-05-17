@@ -62,14 +62,14 @@ void VectorTestOperators()
 
 	First.Clear();
 	TVector<int> Third;
-	ASSERT(First == Second, "TestOps error");
+	ASSERT(First == Third, "TestOps error");
 
-	ASSERT(Second[0] == 1 && Second[3] == 4 && Second[4] == 4, "TestOps error");
+	ASSERT(Second[0] == 1 && Second[3] == 4 && Second[4] == 5, "TestOps error");
 
 	bool bThrown = false;
 	try
 	{
-		First.SafeAt(4);
+		Second.SafeAt(4);
 	}
 	catch (...)
 	{
@@ -92,6 +92,12 @@ void VectorTestOperators()
 	ASSERT(First.AutoAt(0) == 1 && First.SafeAt(1) == 2 &&
 		First[3] == 0 && First[9] == 9 && First.GetSize() == 10,
 		"TestOps error");
+
+	ASSERT(First + Second == TVector<int>(
+		{ 1, 2, 3, 0, 0, 0, 0, 0, 0, 9, 1, 2, 3, 4, 5 }), "TestOps error");
+	
+	ASSERT((Third += Second) == TVector<int>(
+		{ 1, 2, 3, 4, 5 }), "TestOps error");
 }
 
 

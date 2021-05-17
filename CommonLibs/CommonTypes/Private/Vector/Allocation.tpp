@@ -108,7 +108,6 @@ namespace Common
 		T*& OutBuffer, size_t& OutCopySize, size_t& OutAllocSize)
 	{
 		T* TempBuffer = Allocate(AllocSize);
-		size_t i = 0;
 		try
 		{
 			SafeMoveBlock(CopySize, OutBuffer, TempBuffer);

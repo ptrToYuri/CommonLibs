@@ -288,6 +288,10 @@ namespace Common
 		/// Opposite to operator ==.
 		bool operator != (const TVector<T>& Other) const noexcept;
 
+		TVector<T>& operator += (TVector<T>& Other);
+
+		TVector<T> operator + (const TVector<T>& Other);
+
 
 		/**
 		 * @brief Adds one element to the end of vector.
