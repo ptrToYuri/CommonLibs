@@ -9,76 +9,93 @@ namespace Common
 
 
 	template<typename T>
-	TVector<T>::TVector(const size_t Size, const T& DefaultValue)
-		: Size(Size), Capacity(Size)
+	TVector<T>::TVector(const size_t Size,
+		const EReservedCapacityRule CapacityRule)
+		: Capacity(Size), CapacityRule(CapacityRule)
 	{
-		if (!Size)
+		if (!Capacity)
 		{
 			return;
 		}
 
-		Buffer = new T[Capacity];
-		for (size_t i = 0; i < Size; ++i)
+		Buffer = Allocate(Capacity);
+		SafeFillConstruct(0, Capacity, Buffer, T{});
+		this->Size = Capacity;
+	};
+
+
+	template<typename T>
+	TVector<T>::TVector(const size_t Size, const T& DefaultValue,
+		const EReservedCapacityRule CapacityRule)
+		: Capacity(Size), CapacityRule(CapacityRule)
+	{
+		if (!Capacity)
 		{
-			Buffer[i] = DefaultValue;
+			return;
 		}
 
+		Buffer = Allocate(Capacity);
+		SafeFillConstruct(0, Size, Buffer, DefaultValue);
+		this->Size = Size;
 	}
 
 
 	template<typename T>
-	TVector<T>::TVector(const size_t Size, const T* const Array)
-		: Size(Size), Capacity(Size)
+	TVector<T>::TVector(const size_t Size, const T* const Array,
+		const EReservedCapacityRule CapacityRule)
+		: Capacity(Size), CapacityRule(CapacityRule)
 	{
-		if (!Size)
+		if (!Capacity)
 		{
 			return;
 		}
 
-		Buffer = new T[Capacity];
-		CopyFromArray(Size, Array, Buffer);
-
+		Buffer = Allocate(Capacity);
+		SafeBulkConstruct(0, Array, Array + Size, Buffer);
+		this->Size = Size;
 	}
 
 
 	template<typename T>
 	TVector<T>::TVector(const std::initializer_list<T>& ValuesList)
-		: Size(ValuesList.size()), Capacity(Size)
+		: Capacity(ValuesList.size())
 	{
-		if (!Size)
+		if (!Capacity)
 		{
 			return;
 		}
 
-		Buffer = new T[Capacity];
-		CopyFromIterators(ValuesList.begin(), ValuesList.end(), Buffer);
-
+		Buffer = Allocate(Capacity);
+		SafeBulkConstruct(0, ValuesList.begin(), ValuesList.end(), Buffer);
+		Size = Capacity;
 	}
 
 
 	template <typename T>
 	template <typename IteratorType>
 	TVector<T>::TVector(const IteratorType Begin, const IteratorType End,
+		EReservedCapacityRule CapacityRule,
 		// disable this constructor when it "wins" the first one
 		typename std::enable_if<!std::is_integral<
 		IteratorType>::value>::type*)
 
-		: Size(GetIteratorDistance(Begin, End)), Capacity(Size)
+		: Capacity(GetIteratorDistance(Begin, End)),
+		CapacityRule(CapacityRule)
 	{
-		if (!Size)
+		if (!Capacity)
 		{
 			return;
 		}
 
-		Buffer = new T[Capacity];
-		CopyFromIterators(Begin, End, Buffer);
-
+		Buffer = Allocate(Capacity);
+		SafeBulkConstruct(0, Begin, End, Buffer);
+		Size = Capacity;
 	}
 
 
 	template<typename T>
 	TVector<T>::TVector(const TVector<T>& Other)
-		: Size(Other.Size), Capacity(Other.Capacity),
+		: Capacity(Other.Capacity),
 		CapacityRule(Other.CapacityRule)
 	{
 		if (!Capacity)
@@ -86,29 +103,24 @@ namespace Common
 			return;
 		}
 
-		Buffer = new T[Capacity];
-		CopyFromArray(Size, Other.Buffer, Buffer);
-
+		Buffer = Allocate(Capacity);
+		SafeBulkConstruct(0, Other.Buffer, Other.Buffer + Other.Size, Buffer);
+		Size = Other.Size;
 	}
 
 
 	template<typename T>
 	TVector<T>::TVector(TVector<T>&& Other) noexcept
-		: Size(Other.Size), Capacity(Other.Capacity),
-		CapacityRule(Other.CapacityRule), Buffer(Other.Buffer)
 	{
-		Other.Buffer = nullptr;
+		Swap(Other);
 	}
 
 
 	template<typename T>
 	TVector<T>::~TVector()
 	{
-		for (size_t i = 0; i < Size; ++i)
-		{
-			reinterpret_cast<T*>(Buffer)->~T();
-		}
-		delete[] Buffer;
+		DestructAll(Size, Buffer);
+		Deallocate(Buffer);
 	}
 
 
@@ -116,23 +128,28 @@ namespace Common
 	template<typename T>
 	template<typename IteratorType>
 	void TVector<T>::Assign(const IteratorType Begin,
-		const IteratorType End, const bool bAllowAutoShrink)
+		const IteratorType End, const EShrinkBehavior ShrinkBehavior)
 	{
-		Size = GetIteratorDistance(Begin, End);
+		size_t NewSize = GetIteratorDistance(Begin, End);
+		size_t NewCapacity = CalcExtendedCapacity(NewSize);
 
-		if (Size > Capacity)
+		T* TempBuffer = Allocate(NewCapacity);
+		try
 		{
-			delete[] Buffer;	// empty buffer must be nullptr
-			Capacity = CalcExtendedCapacity(Size);
-			Buffer = AllocateOrResetAndThrow(Capacity);
+			SafeBulkConstruct(0, Begin, End, TempBuffer);
 		}
-		else if (bAllowAutoShrink)
+		catch (...)
 		{
-			AutoShrinkIfNeeded();
+			Deallocate(TempBuffer);
+			throw;
 		}
 
-		CopyFromIterators(Begin, End, Buffer);
+		::Swap(TempBuffer, Buffer);
+		::Swap(Size, NewSize);
+		Capacity = NewCapacity;
 
+		DestructAll(NewSize, TempBuffer);
+		Deallocate(TempBuffer);
 	}
 
 
@@ -140,17 +157,7 @@ namespace Common
 	TVector<T>& TVector<T>::operator = (const
 		std::initializer_list<T>& ValuesList)
 	{
-		Size = ValuesList.size();
-
-		if (Size > Capacity)
-		{
-			delete[] Buffer;	// empty buffer must be nullptr
-			Capacity = CalcExtendedCapacity(Size);
-			Buffer = AllocateOrResetAndThrow(Capacity);
-		}
-
-		CopyFromIterators(ValuesList.begin(), ValuesList.end(), Buffer);
-
+		Assign(ValuesList.begin(), ValuesList.end());
 		return *this;
 	}
 
@@ -158,24 +165,26 @@ namespace Common
 	template<typename T>
 	TVector<T>& TVector<T>::operator = (const TVector<T>& Other)
 	{
-		// user expects the same vector: everything must match
-		if (Size != Other.Size || Capacity != Other.Capacity)
+		size_t NewSize = Other.Size;
+
+		T* TempBuffer = Allocate(Other.Capacity);
+		try
 		{
-			Size = Other.Size;
-			Capacity = Other.Capacity;
-			delete[] Buffer;
-			if (Capacity)
-			{
-				Buffer = AllocateOrResetAndThrow(Capacity);
-			}
-			else
-			{
-				Buffer = nullptr;
-			}
+			SafeBulkConstruct(0, Other.Buffer,
+				Other.Buffer + Other.Size, TempBuffer);
+		}
+		catch (...)
+		{
+			Deallocate(TempBuffer);
+			throw;
 		}
 
-		CopyFromArray(Size, Other.Buffer, Buffer);
-		CapacityRule = Other.CapacityRule;
+		::Swap(TempBuffer, Buffer);
+		::Swap(Size, NewSize);
+		Capacity = Other.Capacity;
+
+		DestructAll(NewSize, TempBuffer);
+		Deallocate(TempBuffer);
 
 		return *this;
 	}
@@ -184,13 +193,7 @@ namespace Common
 	template<typename T>
 	TVector<T>& TVector<T>::operator = (TVector<T>&& Other) noexcept
 	{
-		Size = Other.Size;
-		Capacity = Other.Capacity;
-		CapacityRule = Other.CapacityRule;
-		Buffer = Other.Buffer;
-
-		Other.Buffer = nullptr;
-
+		Swap(Other);
 		return *this;
 	}
 
@@ -222,7 +225,7 @@ namespace Common
 	{
 		if (Index >= Size)
 		{
-			Resize(Index + 1, DefaultValue, false);
+			Resize(Index + 1, DefaultValue);
 		}
 
 		return Buffer[Index];
@@ -269,11 +272,10 @@ namespace Common
 	{
 		if (Size + 1 > Capacity)
 		{
-			Reallocate(Size, CalcExtendedCapacity(Size + 1));
+			Reconstruct(Size, CalcExtendedCapacity(Size + 1),
+				Buffer, Size, Capacity);
 		}
-
-		Buffer[Size] = Value;
-
+		Construct(Size, Buffer, Value);
 		++Size;
 	}
 
@@ -286,253 +288,360 @@ namespace Common
 
 		if (Size + Distance > Capacity)
 		{
-			Reallocate(Size, CalcExtendedCapacity(Size + Distance));
+			Reconstruct(Size, CalcExtendedCapacity(Size + Distance),
+				Buffer, Size, Capacity);
 		}
-
-		CopyFromIterators(Begin, End, Buffer + Size);
-
+		SafeBulkConstruct(Size, Begin, End, Buffer);
 		Size += Distance;
 	}
 
 
 
 	template <typename T>
-	void TVector<T>::Insert(const size_t Position, const T& Value,
-		const T& FillOnResizeWith)
+	void TVector<T>::Insert(const size_t Position, const T& Value)
 	{
-		size_t FutureCapacity = Capacity; // update capacity after new as it may throw
-		if (Size >= Capacity || Position >= Capacity)
-		{
-			FutureCapacity = CalcExtendedCapacity(
-				(Position > Size ? Position : Size) + 1);
-		}
-		T* Temp = new T[FutureCapacity];
-		Capacity = FutureCapacity;
+		Insert(Position, &Value, &Value + 1);
+	}
 
-		if (Position <= Size)	// no fill required
-		{
 
-			CopyFromArray(Position, Buffer, Temp);
-			CopyFromArray(Size - Position, Buffer + Position, Temp + Position + 1);
-			++Size;
+	template <typename T>
+	void TVector<T>::SafeInsert(const size_t Position, const T& Value)
+	{
+		SafeInsert(Position, &Value, &Value + 1);
+	}
 
-		}
-		else		// fill with provided elements
-		{
 
-			CopyFromArray(Size, Buffer, Temp);
-			for (size_t i = Size; i < Position; ++i)
-			{
-				Temp[i] = FillOnResizeWith;
-			}
-			Size = Position + 1;
-
-		}
-
-		Temp[Position] = Value;
-
-		delete[] Buffer;
-		Buffer = Temp;
+	template <typename T>
+	void TVector<T>::AutoInsert(const size_t Position, const T& Value,
+		const T& DefaultValue)
+	{
+		AutoInsert(Position, &Value, &Value + 1, DefaultValue);
 	}
 
 
 	template <typename T>
 	template <typename IteratorType>
 	void TVector<T>::Insert(const size_t Position, const IteratorType Begin,
-		const IteratorType End, const T& FillOnResizeWith,
-		// disable this constructor when it is not expected
-		typename std::enable_if<!std::is_integral<
-		IteratorType>::value>::type*)
+		const IteratorType End)
 	{
+		ASSERT(Position <= Size, "Out of range: vector insert");
+
 		size_t Distance = GetIteratorDistance(Begin, End);
 
-		if (Distance == 0)
+		// Step 1: reconstruct up to insert position
+		// Note: clears vector if Move construction fails
+		if (Size + Distance > Capacity)
 		{
-			return;
+			Reconstruct(Size, CalcExtendedCapacity(Size + Distance),
+				Buffer, Size, Capacity);
 		}
 
-		size_t FutureCapacity = Capacity; // update capacity after new as it may throw
-		if (Size + Distance > Capacity || Position + Distance > Capacity)
+		// Step 2: Move old elements out of insertion position
+		// Note: clears vector if Move construction fails
+		try
 		{
-			FutureCapacity = CalcExtendedCapacity(
-				(Position > Size ? Position : Size) + Distance);
+			SafeMoveBlockReverse(Size-Position, Buffer + Position,
+				Buffer + Position + Distance);
 		}
-		T* Temp = new T[FutureCapacity];
-		Capacity = FutureCapacity;
-
-		if (Position <= Size)	// no fill required
+		catch (...)
 		{
-
-			CopyFromArray(Position, Buffer, Temp);
-			CopyFromArray(Size - Position, Buffer + Position, Temp + Position + Distance);
-			CopyFromIterators(Begin, End, Temp + Position);
-			Size += Distance;
-
+			DestructRange(0, Position, Buffer);	// SafeMoveBlock destructed the rest
+			Size = 0;
+			AutoShrinkIfNeeded(EShrinkBehavior::Allow);
+			throw;
 		}
-		else		// fill with provided elements
-		{
 
-			CopyFromArray(Size, Buffer, Temp);
-			for (size_t i = Size; i < Position; ++i)
+		// Step 3: Copy elements to insert
+		// Note: If copy construction fails, tries to revert vector 
+		// to a previous state. In case of Move faulure - clear vector
+		try
+		{
+			SafeBulkConstruct(Position, Begin, End, Buffer);
+		}
+		catch (...)
+		{
+			// try to move values back
+			try
 			{
-				Temp[i] = FillOnResizeWith;
+				SafeMoveBlock(Distance, Buffer + Position + Distance, Buffer + Position);
 			}
-			CopyFromIterators(Begin, End, Temp + Position);
-			Size = Position + Distance;
-
+			catch (...)
+			{
+				DestructRange(0, Position, Buffer);	// SafeMoveBlock destructed the rest
+				Size = 0;
+				AutoShrinkIfNeeded(EShrinkBehavior::Allow);
+				throw;
+			}
+			throw;
 		}
-
-		delete[] Buffer;
-		Buffer = Temp;
+		Size += Distance;
 	}
 
 
+	template <typename T>
+	template <typename IteratorType>
+	void TVector<T>::SafeInsert(const size_t Position, const IteratorType Begin,
+		const IteratorType End)
+	{
+		if (Position > Size)
+		{
+			throw  COutOfRange("Insert() vector out of range");
+		}
+		Insert(Position, Begin, End);
+	}
+
+	template <typename T>
+	template <typename IteratorType>
+	void TVector<T>::AutoInsert(const size_t Position, const IteratorType Begin,
+		const IteratorType End, const T& DefaultValue)
+	{
+		if (Position > Size)
+		{
+			Resize(Position, DefaultValue, EShrinkBehavior::Allow);
+		}
+		Insert(Position, Begin, End);
+	}
+
 
 	template<typename T>
-	T TVector<T>::Pop(const bool bAllowAutoShrink)
+	void TVector<T>::Pop(const EShrinkBehavior ShrinkBehavior)
 	{
 		ASSERT(Size, "Pop() operation on empty vector");
 
-		T PopValue = Buffer[Size - 1];
+		Destruct(Size - 1, Buffer);
 		--Size;
-
-		if (bAllowAutoShrink)
-		{
-			AutoShrinkIfNeeded();
-		}
-
-		return PopValue;
+		AutoShrinkIfNeeded(ShrinkBehavior);
 	}
 
 
 	template<typename T>
-	T TVector<T>::SafePop(const bool bAllowAutoShrink)
+	void TVector<T>::SafePop(const EShrinkBehavior ShrinkBehavior)
 	{
 		if (!Size)
 		{
 			throw COutOfRange("Pop() operation on empty vector");
 		}
 
-		return Pop(bAllowAutoShrink);
+		Pop(ShrinkBehavior);
+	}
+
+
+	template<typename T>
+	T TVector<T>::SafePopGet(const EShrinkBehavior ShrinkBehavior)
+	{
+		if (!Size)
+		{
+			throw COutOfRange("Pop() operation on empty vector");
+		}
+		try
+		{
+			T PopValue(Move(Buffer[Size-1]));	// may throw
+			Pop(ShrinkBehavior);
+			return PopValue;
+		}
+		catch (...)
+		{
+			// handles Move(Buffer[...]) exception
+			// not the best solution, because vector may be cleared
+			// twice, but move throw is not supposed to happen often
+			Clear();
+			throw;
+		}
 	}
 
 
 	template<typename T>
 	void TVector<T>::PopMultiple(const size_t ElementsToPop,
-		const bool bAllowAutoShrink)
+		const EShrinkBehavior ShrinkBehavior)
 	{
 		if (ElementsToPop >= Size)
 		{
-			Size = 0;
-		}
-		else
-		{
-			Size -= ElementsToPop;
+			Clear(ShrinkBehavior);
+			return;
 		}
 
-		if (bAllowAutoShrink)
-		{
-			AutoShrinkIfNeeded();
-		}
+		DestructRange(Size - ElementsToPop, Size, Buffer);
+		Size -= ElementsToPop;
+
+		AutoShrinkIfNeeded(ShrinkBehavior);
 	}
 
 
 
 	template<typename T>
-	T TVector<T>::Shift(const bool bAllowAutoShrink)
+	void TVector<T>::Shift(const EShrinkBehavior ShrinkBehavior)
 	{
 		ASSERT(Size, "Shift() operation on empty vector");
 
-		T ShiftValue = Buffer[0];
+		Destruct(0, Buffer);
 
-		--Size;
-		CopyFromArray(Size, Buffer + 1, Buffer);
-
-		if (bAllowAutoShrink)
+		try
 		{
-			AutoShrinkIfNeeded();
+			SafeMoveBlock(Size - 1, Buffer + 1, Buffer);
 		}
+		catch (...)
+		{
+			Size = 0;
+			AutoShrinkIfNeeded(ShrinkBehavior);
+			throw;
+		}
+		--Size;
 
-		return ShiftValue;
+		AutoShrinkIfNeeded(ShrinkBehavior);
 	}
 
 
 	template<typename T>
-	T TVector<T>::SafeShift(const bool bAllowAutoShrink)
+	void TVector<T>::SafeShift(const EShrinkBehavior ShrinkBehavior)
 	{
 		if (!Size)
 		{
 			throw COutOfRange("Shift() operation on empty vector");
 		}
 
-		return Shift(bAllowAutoShrink);
+		Shift(ShrinkBehavior);
+	}
+
+
+	template<typename T>
+	T TVector<T>::SafeShiftGet(const EShrinkBehavior ShrinkBehavior)
+	{
+		if (!Size)
+		{
+			throw COutOfRange("Shift() operation on empty vector");
+		}
+		try
+		{
+			T ShiftValue(Move(Buffer[0]));	// may throw
+			Shift(ShrinkBehavior);
+			return ShiftValue;
+		}
+		catch (...)
+		{
+			// handles Move(Buffer[...]) exception
+			// not the best solution, because vector may be cleared
+			// twice, but move throw is not supposed to happen often
+			Clear();
+			throw;
+		}
 	}
 
 
 	template<typename T>
 	void TVector<T>::ShiftMultiple(const size_t ElementsToShift,
-		const bool bAllowAutoShrink)
+		const EShrinkBehavior ShrinkBehavior)
 	{
 		if (ElementsToShift >= Size)
 		{
-			Size = 0;
-		}
-		else
-		{
-			CopyFromArray(Size - ElementsToShift, Buffer + ElementsToShift, Buffer);
-			Size -= ElementsToShift;
-		}
-
-		if (bAllowAutoShrink)
-		{
-			AutoShrinkIfNeeded();
-		}
-	}
-
-
-
-	template<typename T>
-	void TVector<T>::Erase(const size_t Position, const bool bAllowAutoShrink)
-	{
-		if (Position >= Size)
-		{
+			Clear(ShrinkBehavior);
 			return;
 		}
 
-		CopyFromArray(Size - Position, Buffer + Position + 1, Buffer + Position);
+		try
+		{
+			SafeMoveBlock(Size - ElementsToShift, Buffer + ElementsToShift, Buffer);
+		}
+		catch (...)
+		{
+			Size = 0;
+			AutoShrinkIfNeeded(ShrinkBehavior);
+			throw;
+		}
+		Size -= ElementsToShift;
+
+		AutoShrinkIfNeeded(ShrinkBehavior);
+	}
+
+
+
+	template<typename T>
+	void TVector<T>::Erase(const size_t Position, const EShrinkBehavior ShrinkBehavior)
+	{
+		ASSERT(Position < Size, "Erase() vector out of range");
+
+		Destruct(Position, Buffer);
+
+		try
+		{
+			SafeMoveBlock(Size - Position, Buffer + Position + 1, Buffer + Position);
+		}
+		catch (...)
+		{
+			DestructRange(0, Position, Buffer);
+			Size = 0;
+			AutoShrinkIfNeeded(ShrinkBehavior);
+			throw;
+		}
 		Size--;
 
-		if (bAllowAutoShrink)
+		AutoShrinkIfNeeded(ShrinkBehavior);
+	}
+
+
+	template<typename T>
+	void TVector<T>::SafeErase(const size_t Position,
+		const EShrinkBehavior ShrinkBehavior)
+	{
+		if (Position >= Size)
 		{
-			AutoShrinkIfNeeded();
+			throw COutOfRange("Out of range: Erase() vector");
+		}
+
+		Erase(ShrinkBehavior);
+	}
+
+
+	template<typename T>
+	T TVector<T>::SafeEraseGet(const size_t Position,
+		const EShrinkBehavior ShrinkBehavior)
+	{
+		if (Position >= Size)
+		{
+			throw COutOfRange("Out of range: Erase() vector");
+		}
+		try
+		{
+			T EraseValue(Move(Buffer[Position]));	// may throw
+			Erase(Position, ShrinkBehavior);
+			return EraseValue;
+		}
+		catch (...)
+		{
+			// handles Move(Buffer[...]) exception
+			// not the best solution, because vector may be cleared
+			// twice, but move throw is not supposed to happen often
+			Clear();
+			throw;
 		}
 	}
 
 
-	// note: different name was chosen intentionally to avoid implicit conversion
+	// Note: different name was chosen to avoid implicit conversion
 	// of second parameter to boolean and deleting only one element
 	template<typename T>
 	void TVector<T>::EraseMultiple(const size_t PositionFrom,
-		size_t PositionTo, const bool bAllowAutoShrink)
+		size_t PositionTo, const EShrinkBehavior ShrinkBehavior)
 	{
 		if (PositionTo > Size)
 		{
 			PositionTo = Size;
 		}
-		size_t Offset = PositionTo - PositionFrom;
-		if (Offset < 0)
-		{
-			return;
-		}
 
-		CopyFromArray(Size - PositionTo, Buffer + PositionFrom + Offset,
-			Buffer + PositionFrom);
-		Size -= Offset;
-
-		if (bAllowAutoShrink)
+		try
 		{
-			AutoShrinkIfNeeded();
+			SafeMoveBlock(Size - PositionTo, Buffer + PositionTo,
+				Buffer + PositionFrom);
 		}
+		catch (...)
+		{
+			DestructRange(0, PositionFrom, Buffer);
+			Size = 0;
+			AutoShrinkIfNeeded(ShrinkBehavior);
+			throw;
+		}
+		Size -= PositionTo - PositionFrom;
+
+		AutoShrinkIfNeeded(ShrinkBehavior);
 	}
 
 
@@ -544,11 +653,11 @@ namespace Common
 		{
 			if (NewCapacity)
 			{
-				Reallocate(Size, NewCapacity);
+				Reconstruct(Size, NewCapacity, Buffer, Size, Capacity);
 			}
 			else
 			{
-				Clear(true);
+				Clear();
 			}
 		}
 	}
@@ -556,28 +665,33 @@ namespace Common
 
 	template<typename T>
 	void TVector<T>::Resize(const size_t NewSize, const T& DefaultValue,
-		const bool bAllowAutoShrink)
+		const EShrinkBehavior ShrinkBehavior)
 	{
 		if (NewSize > Capacity)
 		{
-			Reallocate(Size, CalcExtendedCapacity(NewSize));
+			Reconstruct(Size, CalcExtendedCapacity(NewSize),
+				Buffer, Size, Capacity);
 		}
 
-		if (NewSize > Size)
+		try
 		{
-			for (size_t i = Size; i < NewSize; ++i)
+			if (NewSize > Size)
 			{
-				Buffer[i] = DefaultValue;
+				SafeFillConstruct(Size, NewSize, Buffer, DefaultValue);
+			}
+			else
+			{
+				DestructRange(NewSize, Size, Buffer);
 			}
 		}
-
-		else if (bAllowAutoShrink)
+		catch (...)
 		{
-			Size = NewSize;
-			AutoShrinkIfNeeded();
+			AutoShrinkIfNeeded(ShrinkBehavior);
+			throw;
 		}
 
 		Size = NewSize;
+		AutoShrinkIfNeeded(ShrinkBehavior);
 	}
 
 
@@ -585,19 +699,7 @@ namespace Common
 	template<typename T>
 	void TVector<T>::Swap(TVector<T>& Other) noexcept
 	{
-		size_t Temp;
-
-		Temp = Other.Size;
-		Other.Size = Size;
-		Size = Temp;
-
-		Temp = Other.Capacity;
-		Other.Capacity = Capacity;
-		Capacity = Temp;
-
-		T* TempBuffer = Other.Buffer;
-		Other.Buffer = Buffer;
-		Buffer = Temp;
+		::Swap(Other, *this);
 	}
 
 
@@ -612,25 +714,28 @@ namespace Common
 
 		if (Size)
 		{
-			Reallocate(Size, Size);
+			Reconstruct(Size, Size, Buffer, Size, Capacity);
 		}
 		else
 		{
-			Clear(true);
+			Clear(EShrinkBehavior::Require);
 		}
 	}
 
 
 	template<typename T>
-	void TVector<T>::Clear(bool bDoFreeMemory)
+	void TVector<T>::Clear(EShrinkBehavior ShrinkBehavior)
 	{
+		DestructAll(Size, Buffer);
 		Size = 0;
-
-		if (bDoFreeMemory)
+		if (ShrinkBehavior == EShrinkBehavior::Require)
 		{
-			delete[] Buffer;
-			Buffer = nullptr;
+			Deallocate(Buffer);
 			Capacity = 0;
+		}
+		else
+		{
+			AutoShrinkIfNeeded(ShrinkBehavior);
 		}
 	}
 
@@ -717,113 +822,6 @@ namespace Common
 
 
 	template<typename T>
-	typename TVector<T>::CIterator TVector<T>::Begin()
-	{
-		return CIterator(Buffer);
-	}
-
-
-	template<typename T>
-	typename TVector<T>::CConstIterator TVector<T>::ConstBegin() const
-	{
-		return CConstIterator(Buffer);
-	}
-
-	template<typename T>
-	typename TVector<T>::CReverseIterator TVector<T>::ReverseBegin()
-	{
-		return CReverseIterator(Buffer + Size);
-	}
-
-	template<typename T>
-	typename TVector<T>::CConstReverseIterator
-		TVector<T>::ConstReverseBegin() const
-	{
-		return CConstReverseIterator(Buffer + Size);
-	}
-
-	template<typename T>
-	typename TVector<T>::CSafeIterator TVector<T>::SafeBegin()
-	{
-		return CSafeIterator(Buffer, this);
-	}
-
-	template<typename T>
-	typename TVector<T>::CSafeConstIterator
-		TVector<T>::SafeConstBegin() const
-	{
-		return CSafeConstIterator(Buffer, this);
-	}
-
-	template<typename T>
-	typename TVector<T>::CSafeReverseIterator
-		TVector<T>::SafeReverseBegin()
-	{
-		return CSafeReverseIterator(Buffer + Size, this);
-	}
-
-	template<typename T>
-	typename TVector<T>::CSafeConstReverseIterator
-		TVector<T>::SafeConstReverseBegin() const
-	{
-		return CSafeConstReverseIterator(Buffer + Size, this);
-	}
-
-	template<typename T>
-	typename TVector<T>::CIterator TVector<T>::End()
-	{
-		return CIterator(Buffer + Size);
-	}
-
-	template<typename T>
-	typename TVector<T>::CConstIterator TVector<T>::ConstEnd() const
-	{
-		return CConstIterator(Buffer + Size);
-	}
-
-	template<typename T>
-	typename TVector<T>::CReverseIterator TVector<T>::ReverseEnd()
-	{
-		return CReverseIterator(Buffer);
-	}
-
-	template<typename T>
-	typename TVector<T>::CConstReverseIterator
-		TVector<T>::ConstReverseEnd() const
-	{
-		return CConstReverseIterator(Buffer);
-	}
-
-	template<typename T>
-	typename TVector<T>::CSafeIterator TVector<T>::SafeEnd()
-	{
-		return CSafeIterator(Buffer + Size, this);
-	}
-
-	template<typename T>
-	typename TVector<T>::CSafeConstIterator
-		TVector<T>::SafeConstEnd() const
-	{
-		return CSafeConstIterator(Buffer + Size, this);
-	}
-
-	template<typename T>
-	typename TVector<T>::CSafeReverseIterator
-		TVector<T>::SafeReverseEnd()
-	{
-		return CSafeReverseIterator(Buffer, this);
-	}
-
-	template<typename T>
-	typename TVector<T>::CSafeConstReverseIterator
-		TVector<T>::SafeConstReverseEnd() const
-	{
-		return CSafeConstReverseIterator(Buffer, this);
-	}
-
-
-
-	template<typename T>
 	size_t TVector<T>::CalcExtendedCapacity(const size_t NewSize)
 	{
 		// no switch case for optimization
@@ -842,92 +840,47 @@ namespace Common
 	}
 
 
-	template <typename T>
-	void TVector<T>::Reallocate(const size_t OldSize, const size_t NewCapacity)
-	{
-		T* Temp = new T[NewCapacity];
-		Capacity = NewCapacity;
-
-		CopyFromArray(OldSize, Buffer, Temp);
-
-		delete[] Buffer;
-		Buffer = Temp;
-	}
-
-
 	template<typename T>
-	T* TVector<T>::AllocateOrResetAndThrow(const size_t NewCapacity)
-	{
-		try {
-			return new T[NewCapacity];
-		}
-		catch (const std::bad_alloc& Exception)
-		{
-			Capacity = 0;
-			Size = 0;
-			throw Exception;
-		}
-	}
-
-
-	template<typename T>
-	void TVector<T>::AutoShrinkIfNeeded()
+	void TVector<T>::AutoShrinkIfNeeded(EShrinkBehavior ShrinkBehavior)
 	{
 		// no switch case for optimization
-		// as first condition is almost always true
-		if (CapacityRule ==
-			EReservedCapacityRule::Exponential)
+		// as first conditions are almost always true
+
+		if (ShrinkBehavior == EShrinkBehavior::Allow)
 		{
-			// if capacity exceeds 4*size and is
-			// not small, dealloc half of it. 
-			if (Capacity >= 4 * Size &&
-				Capacity >= 2 + 16 / sizeof(T))
+
+			if (CapacityRule == EReservedCapacityRule::Exponential)
 			{
-				Reallocate(Size, Size * 2);
+				// if capacity exceeds 4*size and is
+				// not small, dealloc half of it. 
+				if (Capacity >= 4 * Size &&
+					Capacity >= 2 + 16 / sizeof(T))
+				{
+					Reconstruct(Size, Size * 2, Buffer, Size, Capacity);
+				}
 			}
+
+			else if (CapacityRule == EReservedCapacityRule::Linear)
+			{
+				// if capacity exceeds size by > 2 chunks,
+				// leave one empty chunk
+				if (Capacity - Size >= 8 + 64 / sizeof(T))
+				{
+					Reconstruct(Size, Size + 4 + 32 / sizeof(T),
+						Buffer, Size, Capacity);
+				}
+			}
+
+			else
+			{
+				ShrinkToFit();
+			}
+
 		}
 
-		else if (CapacityRule ==
-			EReservedCapacityRule::Linear)
-		{
-			// if capacity exceeds size by > 2 chunks,
-			// leave one empty chunk
-			if (Capacity - Size >= 8 + 64 / sizeof(T))
-			{
-				Reallocate(Size, Size + 4 + 32 / sizeof(T));
-			}
-		}
-
-		else
+		else if (ShrinkBehavior == EShrinkBehavior::Require)
 		{
 			ShrinkToFit();
-		}
-	}
-
-
-
-	template <typename T>
-	template <typename IteratorType>
-	void TVector<T>::CopyFromIterators(IteratorType Begin,
-		const IteratorType End, T* outBuffer)
-	{
-		size_t i = 0;
-		while (Begin != End)
-		{
-			outBuffer[i] = *Begin;
-			++Begin;
-			++i;
-		}
-	}
-
-
-	template <typename T>
-	void TVector<T>::CopyFromArray(const size_t Size,
-		const T* const ArrayFrom, T* outArrayTo)
-	{
-		for (size_t i = 0; i < Size; ++i)
-		{
-			outArrayTo[i] = ArrayFrom[i];
 		}
 	}
 

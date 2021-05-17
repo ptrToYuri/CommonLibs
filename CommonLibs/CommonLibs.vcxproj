@@ -165,6 +165,7 @@
   <ItemGroup>
     <None Include="CommonTypes\Private\Optional.tpp" />
     <None Include="CommonTypes\Private\Vector\Allocation.tpp" />
+    <None Include="CommonTypes\Private\Vector\Iterator.tpp" />
     <None Include="CommonTypes\Private\Vector\Vector.tpp" />
     <None Include="CommonTypes\Private\Iterators\Block.tpp" />
     <None Include="CommonUtils\Private\AdvancedIteration.tpp" />

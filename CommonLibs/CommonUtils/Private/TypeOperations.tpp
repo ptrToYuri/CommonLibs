@@ -14,9 +14,9 @@ namespace Common
 
 	template<typename T>
 	void Swap(T& First, T& Second) {
-		T Temp = Move(First);
-		First = std::move(Second);
-		Second = std::move(Temp);
+		T Temp(Move(First));
+		First = Move(Second);
+		Second = Move(Temp);
 	}
 
 }

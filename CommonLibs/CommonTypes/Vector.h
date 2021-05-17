@@ -11,6 +11,7 @@
 #include "Exception.h"
 #include "Iterators/Block.h"
 #include "../CommonUtils/Assert.h"
+#include "./../CommonUtils/TypeOperations.h"	// Move, Swap
 #include "../CommonUtils/AdvancedIteration.h"
 
 namespace Common
@@ -41,38 +42,31 @@ namespace Common
 
 	public:
 
-		typedef T value_type;	// Following convention
+		typedef T value_type;	// Follow convention
 
 		/// Iterator. Implemented op-s: ++, +=, +, --, -=, -, ==, !=, =.
 		typedef Iterators::TBlockIterator<T*, T&> CIterator;
-		
 		/// Version of CIterator for const values.
 		typedef Iterators::TBlockIterator<const T*, const T&> CConstIterator;
-
 		/// Reverse iterator. Increment is actually decrement, etc.
 		typedef Iterators::TReverseBlockIterator<T*, T&> CReverseIterator;
-
 		/// Version of TReverseIterator for const values.
 		typedef Iterators::TReverseBlockIterator<const T*, const T&>
 			CConstReverseIterator;
-
 		/// Iterator that does bounds checking and throws OutOfRange().
 		typedef Iterators::TSafeBlockIterator<T*, T&, TVector<T>*> CSafeIterator;
-
 		/// Version of TSafeIterator for const values.
 		typedef Iterators::TSafeBlockIterator<const T*, const T&, const  TVector<T>*>
 			CSafeConstIterator;
-
 		/// Reverse iterator that can throw OutOfRange().
 		typedef Iterators::TSafeReverseBlockIterator<T*, T&, TVector<T>*>
 			CSafeReverseIterator;
-
 		/// Version of TSafeReverseIterator for const values.
 		typedef Iterators::TSafeReverseBlockIterator<const T*, const T&, const TVector<T>*>
 			CSafeConstReverseIterator;
 
 
-		/// Used to define how methods deal with Capacity. 
+		/// Defines how extra Capacity is reserved
 		enum class EReservedCapacityRule : uint8_t
 		{
 			/**
@@ -93,40 +87,78 @@ namespace Common
 
 			/**
 			 * [ADD, DEL] memory is never reserved automatically;
-			 * if true bAllowAutoShrink was passed into another
-			 * method, then ShrinkToFit() will be called
+			 * Decrease of vector size causes ShrinkToFit() immediately
 			*/
 			NeverReserve
 		};
 
+		/// Overrides CapacityRule for specific element removal case
+		enum class EShrinkBehavior
+		{
+			/**
+			 * Force reallocation if possible.
+			 * Same as calling ShrinkToFit() after each operation
+			 * or setting EReservedCapacityRule to NeverReserve
+			*/
+			Require,
 
-		/// Empty vector with no heap allocation.
-		TVector() = default;
+			/**
+			 * Used as default value.
+			 * Inherits behavior from EReservedCapacityRule.
+			 * @see EReservedCapacityRule for more info about presets.
+			*/
+			Allow,
+
+			/**
+			 * Do not deallocate memory, even if EReservedCapacityRule
+			 * prescribes that.
+			*/
+			Deny
+		};
+
 
 		/**
-		 * @brief Creates empty vector with Capacity preset predefined.
-		 * @param CapacityRule Describes how memory will be reserved
+		 * @brief Creates empty vector with Capacity preset predefined
+		 * @param CapacityRule Optional. Describes how memory is reserved
 		 * @see EReservedCapacityRule for more info about presets.
 		*/
-		TVector(EReservedCapacityRule CapacityRule) noexcept;
+		TVector(EReservedCapacityRule CapacityRule
+			= EReservedCapacityRule::Exponential) noexcept;
 
 		/**
-		 * @brief Vector with pre-allocated elements
+		 * @brief Vector with pre-allocated memory for elements
 		 * @param Size Number of elements to allocate
-		 * @param DefaultValue Optional. Value to initialize with
-		 * @see Use Reserve() on empty vector to avoid initialization.
+		 * @param CapacityRule Optional. Describes how memory is reserved
+		 * @note Does not create actual elements.
+		 * @see EReservedCapacityRule for more info about presets.
 		*/
-		explicit TVector(size_t Size, const T& DefaultValue = {});
+		explicit TVector(size_t Size, EReservedCapacityRule CapacityRule
+			= EReservedCapacityRule::Exponential);
+
+		/**
+		 * @brief Vector with pre-created elements
+		 * @param Size Number of elements to allocate
+		 * @param DefaultValue Value to initialize with
+		 * @param CapacityRule Optional. Describes how memory is reserved
+		 * @see EReservedCapacityRule for more info about presets.
+		*/
+		TVector(size_t Size, const T& DefaultValue,
+			EReservedCapacityRule CapacityRule
+			= EReservedCapacityRule::Exponential);
 
 		/**
 		 * @brief Vector constructed from raw dynamic array (copy).
 		 * @param Size Number of elements in original array
 		 * @param Array Pointer to heap with C-style array
 		 * @note Array[0] to Array[Size-1] must exist and have
-		 *		 the same type as vector.
+		 *		 the same type as vector value_type.
+		 * @param CapacityRule Optional. Describes how memory is reserved
 		 * @note Raw array is not changed.
+		 * @see EReservedCapacityRule for more info about presets.
 		*/
-		TVector(size_t Size, const T* const Array);
+		TVector(size_t Size, const T* const Array,
+			EReservedCapacityRule CapacityRule
+			= EReservedCapacityRule::Exponential);
 
 		/**
 		 * @brief Modern C++ initialization syntax: name = {...}.
@@ -139,9 +171,13 @@ namespace Common
 		 * @tparam IteratorType Iterator that implements ++, != and *
 		 * @param Begin Iterator referring to the beginning of container
 		 * @param End Iterator referring to the end of container
+		 * @param CapacityRule Optional. Describes how memory is reserved
+		 * @see EReservedCapacityRule for more info about presets.
 		*/
 		template <typename IteratorType>
 		TVector(IteratorType Begin, IteratorType End,
+			EReservedCapacityRule CapacityRule
+			= EReservedCapacityRule::Exponential,
 			// resolving template constructors conflict (SFINAE)
 			typename std::enable_if<!std::is_integral<
 			IteratorType>::value >::type* = 0);
@@ -169,7 +205,7 @@ namespace Common
 		*/
 		template <typename IteratorType>
 		void Assign(IteratorType Begin, IteratorType End,
-			bool bAllowAutoShrink = false);
+			EShrinkBehavior ShrinkBehavior = EShrinkBehavior::Allow);
 
 		/**
 		 * @brief Allows assignment with = {...} style.
@@ -279,8 +315,12 @@ namespace Common
 		 *		  this value
 		 * @note If Position is greater than max index, vector is resized.
 		*/
-		void Insert(size_t Position, const T& Value = T{},
-			const T& FillOnResizeWith = T{});
+		void Insert(size_t Position, const T& Value);
+
+		void SafeInsert(size_t Position, const T& Value);
+
+		void AutoInsert(size_t Position, const T& Value,
+			const T& DefaultValue = {});
 
 		/**
 		 * @brief Inserts range of elements, starting at Position
@@ -295,10 +335,15 @@ namespace Common
 		*/
 		template <typename IteratorType>
 		void Insert(size_t Position, IteratorType Begin,
-			IteratorType End, const T& FillOnResizeWith = T{},
-			// another SFINAE trick resolving conflicts with implicit cast
-			typename std::enable_if<!std::is_integral<
-			IteratorType>::value >::type* = 0);
+			IteratorType End);
+
+		template <typename IteratorType>
+		void SafeInsert(size_t Position, IteratorType Begin,
+			IteratorType End);
+
+		template <typename IteratorType>
+		void AutoInsert(size_t Position, IteratorType Begin,
+			IteratorType End, const T& DefaultValue = {});
 
 		/**
 		 * @brief Removes one element from the end of vector.
@@ -307,10 +352,15 @@ namespace Common
 		 * @return Removed element (by value)
 		 * @note Vector must not be empty.
 		*/
-		T Pop(bool bAllowAutoShrink = false);
+		void Pop(EShrinkBehavior ShrinkBehavior = EShrinkBehavior::Allow);
 
 		/// Pop() with range check
-		T SafePop(bool bAllowAutoShrink = false);
+		void SafePop(EShrinkBehavior ShrinkBehavior
+			= EShrinkBehavior::Allow);
+
+		/// SafePop() that returns removed value
+		T SafePopGet(EShrinkBehavior ShrinkBehavior
+			= EShrinkBehavior::Allow);
 
 		/**
 		 * @brief Removes N elements from the end of vector.
@@ -320,7 +370,7 @@ namespace Common
 		 * @note If ElementsCount >= Size, clears vector
 		*/
 		void PopMultiple(size_t ElementsCount,
-			bool bAllowAutoShrink = false);
+			EShrinkBehavior ShrinkBehavior = EShrinkBehavior::Allow);
 
 		/**
 		 * @brief Removes one element from the beginning of vector.
@@ -328,10 +378,15 @@ namespace Common
 		 *		  according to the capacity rule. See: EReservedCapacityRule
 		 * @return Removed element (by value)
 		*/
-		T Shift(bool bAllowAutoShrink = false);
+		void Shift(EShrinkBehavior ShrinkBehavior = EShrinkBehavior::Allow);
 
 		/// Shift() with range check
-		T SafeShift(bool bAllowAutoShrink = false);
+		void SafeShift(EShrinkBehavior ShrinkBehavior
+			= EShrinkBehavior::Allow);
+
+		/// SafeShift() that returns removed value
+		T SafeShiftGet(EShrinkBehavior ShrinkBehavior
+			= EShrinkBehavior::Allow);
 
 		/**
 		 * @brief Removes N elements from the beginning of vector.
@@ -340,8 +395,8 @@ namespace Common
 		 *		  to the capacity rule. See: EReservedCapacityRule
 		 * @note If ElementsCount >= Size, clears vector
 		*/
-		void ShiftMultiple(size_t ElementsCount,
-			bool bAllowAutoShrink = false);
+		void ShiftMultiple(size_t ElementsToShift,
+			EShrinkBehavior ShrinkBehavior = EShrinkBehavior::Allow);
 
 		/**
 		 * @brief Removes element with specified position.
@@ -353,7 +408,14 @@ namespace Common
 		 *			use EraseMultiple(). Your code with such a mistake
 		 *			will be compiled because of optional bool param.
 		*/
-		void Erase(size_t Position, bool bAllowAutoShrink = false);
+		void Erase(size_t Position,
+			EShrinkBehavior ShrinkBehavior = EShrinkBehavior::Allow);
+
+		void SafeErase(size_t Position,
+			EShrinkBehavior ShrinkBehavior = EShrinkBehavior::Allow);
+
+		T SafeEraseGet(size_t Position,
+			EShrinkBehavior ShrinkBehavior = EShrinkBehavior::Allow);
 
 		/**
 		 * @brief Removes range of elements from vector
@@ -369,7 +431,7 @@ namespace Common
 		 *
 		*/
 		void EraseMultiple(size_t PositionFrom, size_t PositionTo,
-			bool bAllowAutoShrink = false);
+			EShrinkBehavior ShrinkBehavior = EShrinkBehavior::Allow);
 
 
 		/**
@@ -390,7 +452,7 @@ namespace Common
 		 *		  according to the capacity rule. See: EReservedCapacityRule
 		*/
 		void Resize(size_t NewSize, const T& DefaultValue = {},
-			bool bAllowAutoShrink = false);
+			EShrinkBehavior ShrinkBehavior = EShrinkBehavior::Allow);
 
 		/**
 		 * @brief Swaps two vectors internally without deep copy.
@@ -410,7 +472,7 @@ namespace Common
 		 *		  otherwise, actual delete operation will not be called
 		 * @attention Set bool to true if you really want to free memory.
 		*/
-		void Clear(bool bDoFreeMemory = false);
+		void Clear(EShrinkBehavior ShrinkBehavior = EShrinkBehavior::Allow);
 
 
 		/**
@@ -607,7 +669,6 @@ namespace Common
 		CConstReverseIterator rbegin() const { return ConstReverseBegin(); }
 		/// ConstReverseBegin() alias (for compatibity)
 		CConstReverseIterator crbegin() const { return ConstReverseBegin(); }
-
 		/// End() alias (for compatibity)
 		CIterator end() { return End(); }
 		/// ConstEnd() alias (overloaded, for compatibity)
@@ -629,22 +690,28 @@ namespace Common
 		T* Buffer = nullptr;		// storage
 		EReservedCapacityRule CapacityRule =  // capacity management
 			EReservedCapacityRule::Exponential;
-		
-		inline T* Allocate(size_t NewSize);
-		inline void Deallocate(T* Buffer) noexcept;
-		inline void Construct(size_t Index, T* Buffer, T& value = {});
-		inline void Destruct(size_t Index, T* Buffer) noexcept;
-		inline void DestructAll(size_t Size, T* Buffer) noexcept;
-		
-		size_t CalcExtendedCapacity(size_t NewSize);
-		void Reallocate(size_t OldSize, size_t NewCapacity);
-		T* AllocateOrResetAndThrow(size_t NewCapacity);
-		void AutoShrinkIfNeeded();
 
+		inline T* Allocate(size_t NewSize);
+		inline void Deallocate(T*& OutBuffer) noexcept;
+		inline void Construct(size_t Index, T* OutBuffer, const T& Value);
+		inline void Destruct(size_t Index, T* OutBuffer) noexcept;
+		inline void DestructRange(size_t From, size_t To, 
+			T* OutBuffer) noexcept;	// [From; To)
+		inline void DestructAll(size_t Size, T* OutBuffer) noexcept;
+
+		void SafeMoveBlock(size_t Size, T* FromBuffer, T* ToBuffer);
+		void SafeMoveBlockReverse(size_t Size, T* FromBuffer, T* ToBuffer);
+		void Reconstruct(size_t CopySize, size_t NewCapacity,
+			T*& OutBuffer, size_t& OutCapacity, size_t& OutSize);
 		template <typename IteratorType>
-		void CopyFromIterators(IteratorType Begin,
-			IteratorType End, T* Buffer);
-		void CopyFromArray(size_t Size, const T* const Array1, T* Array2);
+		void SafeBulkConstruct(size_t StartPosition, IteratorType From, 
+			IteratorType To, T* OutBuffer);
+		void SafeFillConstruct(size_t StartPosition, size_t EndPosition,
+			T* OutBuffer, const T& Value);
+
+		size_t CalcExtendedCapacity(size_t NewSize);
+		void AutoShrinkIfNeeded(EShrinkBehavior ShrinkBehavior);
+
 
 		friend CIterator;
 		friend CConstIterator;
@@ -661,3 +728,4 @@ namespace Common
 
 #include "Private/Vector/Vector.tpp"
 #include "Private/Vector/Allocation.tpp"
+#include "Private/Vector/Iterator.tpp"

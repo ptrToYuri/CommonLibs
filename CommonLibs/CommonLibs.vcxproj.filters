@@ -56,6 +56,7 @@
     <None Include="CommonTypes\Private\Optional.tpp" />
     <None Include="CommonTypes\Private\Vector\Allocation.tpp" />
     <None Include="CommonUtils\Private\TypeOperations.tpp" />
+    <None Include="CommonTypes\Private\Vector\Iterator.tpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommonUtils\Private\RawString.cpp">

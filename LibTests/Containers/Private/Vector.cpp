@@ -130,9 +130,10 @@ void VectorTestPushPopShift()
 	First.Push(2);
 	First.Push(3);
 	First.Push(4);
-	First.ShiftMultiple(2, true);
+	First.ShiftMultiple(2);
 
-	ASSERT(First.Shift() == 3 && First.Pop() == 4 && First.GetSize() == 0,
+	ASSERT(First.SafeShiftGet() == 3 && First.SafePopGet() == 4
+		&& First.GetSize() == 0,
 		"Vector PushPopShift error");
 
 	First = { 1,2,3,4,5 };
@@ -183,14 +184,13 @@ void VectorTestInsert()
 
 	First = { 1 };
 	Second = { 1,0,0,0,0,0,0,0,0,99 };
-	First.Insert(9, 99);
+	First.AutoInsert(9, 99);
 	ASSERT(First == Second, "Vector insert error");
 
 	First = {};
 	First.Insert(0, 1);
 	Second = { 1 };
 	ASSERT(First == Second, "Vector insert error");
-
 }
 
 
@@ -213,7 +213,7 @@ void VectorTestReserve()
 	ASSERT(First.GetCapacity() == 98 && First.GetSize() == 2,
 		"Vector capacity error");
 
-	First.Pop(true);
+	First.Pop();
 	ASSERT(First.GetCapacity() == 2, "Vector capacity error");
 
 	First.Pop();
@@ -230,7 +230,7 @@ void VectorTestReserve()
 
 	for (int i = 0; i < 50; ++i)
 	{
-		Second.Shift(true);
+		Second.Shift();
 		ASSERT(Second.GetSize() == Second.GetCapacity(), "Vector capacity error");
 	}
 	ASSERT(Second.GetCapacity() == 0, "Vector capacity error");
@@ -238,7 +238,7 @@ void VectorTestReserve()
 	Second.SetCapacityRule(TVector<int>::EReservedCapacityRule::Linear);
 	Second.Resize(64);
 	ASSERT(Second.GetCapacity() == 75, "Vector capacity error");
-	Second.Resize(15, 0, true);
+	Second.Resize(15, 0);
 	ASSERT(Second.GetCapacity() == 27, "Vector capacity error");
 
 	Second.Reserve(30);
@@ -273,7 +273,7 @@ void VectorTestResize()
 	TVector<int> Third = { 1,4,5,6,2,3 };
 	ASSERT(First == Third, "Vector resize error");
 
-	First.Insert(16, Second.Begin(), Second.End());
+	First.AutoInsert(16, Second.Begin(), Second.End());
 	Third = { 1,4,5,6,2,3,0,0,0,0,0,0,0,0,0,0,4,5,6 };
 	ASSERT(First == Third, "Vector resize error");
 
@@ -287,7 +287,7 @@ void VectorTestErase()
 {
 	TVector<int> First = { 1,2,3,4,5 };
 	First.Erase(0);
-	First.Erase(1, true);
+	First.Erase(1);
 	TVector<int> Second = { 2,4,5 };
 	ASSERT(First == Second, "Vector erase error");
 
@@ -296,12 +296,12 @@ void VectorTestErase()
 	ASSERT(First == Second, "Vector erase error");
 
 	First.Erase(0);
-	First.Erase(0, true);
+	First.Erase(0);
 	Second = {};
 	ASSERT(First == Second, "Vector erase error");
 
 	First = { 1,2,3,4,5 };
-	First.EraseMultiple(2, 10, true);
+	First.EraseMultiple(2, 10);
 	Second = { 1,2 };
 	ASSERT(First == Second, "Vector erase error");
 
@@ -313,7 +313,6 @@ void VectorTestErase()
 	First.EraseMultiple(0, 2);
 	First.EraseMultiple(0, 0);
 	First.EraseMultiple(0, 0);
-	First.Erase(100);
 	Second = { 4,5 };
 	ASSERT(First == Second, "Vector erase error");
 
@@ -381,7 +380,7 @@ void VectorTestIterators()
 	ASSERT(ErrIndex == -1 && RangeMin == 0 && RangeMax == 5,
 		"Vector iterator error");
 
-	try 
+	try
 	{
 		auto it = Third.SafeConstEnd() + 1;
 	}
