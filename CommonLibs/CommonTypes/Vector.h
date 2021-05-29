@@ -308,7 +308,7 @@ namespace Common
 		 * @param Other Other vector to copy values from
 		 * @return Reference to this vector
 		*/
-		TVector<T>& operator += (TVector<T>& Other);
+		TVector<T>& operator += (const TVector<T>& Other);
 
 		/**
 		 * @brief Concatenates vectors (push 1 with 2)

@@ -253,7 +253,7 @@ namespace Common
 
 
 	template<typename T>
-	TVector<T>& TVector<T>::operator += (TVector<T>& Other)
+	TVector<T>& TVector<T>::operator += (const TVector<T>& Other)
 	{
 		Push(Other.Buffer, Other.Buffer + Other.Size);
 		return *this;
