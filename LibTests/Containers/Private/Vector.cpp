@@ -430,3 +430,35 @@ void VectorTestConst()
 	ASSERT(First.Back() - 2 == First[2], "Vector const error");
 	// no more tests needed thanks to IDE
 }
+
+
+class CTest
+{
+public:
+	CTest()
+	{
+		std::cout << "+ CTest constructed\n";
+	}
+	CTest(const CTest& Other)
+	{
+		std::cout << "+ CTest copy constructed\n";
+	}
+	CTest(CTest&& Other) noexcept
+	{
+		std::cout << "+ CTest move constructed\n";
+	}
+	~CTest()
+	{
+		std::cout << "- CTest destructed\n";
+	}
+};
+
+void VectorTestPlacementNew()
+{
+	CTest Var;
+	TVector<CTest> First;
+	for (int i = 0; i < 10; ++i)
+	{
+		First.Push(Var);
+	}
+}

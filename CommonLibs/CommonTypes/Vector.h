@@ -54,6 +54,7 @@ namespace Common
 	 * @todo Implement SFINAE to support types without nonparam ctor
 	 *		 and types without overloaded == operator
 	 * 
+	 * @bug Move may not be performed
 	*/
 	template <typename T>
 	class TVector

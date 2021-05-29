@@ -4,6 +4,7 @@
 
 // RUN IN DEBUG MODE!!
 
+#include <iostream>
 #include "CommonTypes/Vector.h"
 #include "CommonUtils/Assert.h"
 #include "CommonTypes/Exception.h"
@@ -20,6 +21,7 @@ void VectorTestResize();
 void VectorTestErase();
 void VectorTestIterators();
 void VectorTestConst();
+void VectorTestPlacementNew();
 
 
 inline void RunVectorTests()
@@ -34,4 +36,5 @@ inline void RunVectorTests()
 	VectorTestErase();
 	VectorTestIterators();
 	VectorTestConst();
+//	VectorTestPlacementNew();
 }
