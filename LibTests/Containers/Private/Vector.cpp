@@ -1,4 +1,4 @@
-// Yuri Zamyatin, 2020. This file is part of LibTests
+// Yuri Zamyatin, 2020-2021. This file is part of LibTests
 
 #include "../Vector.h"
 
@@ -62,14 +62,14 @@ void VectorTestOperators()
 
 	First.Clear();
 	TVector<int> Third;
-	ASSERT(First == Second, "TestOps error");
+	ASSERT(First == Third, "TestOps error");
 
-	ASSERT(Second[0] == 1 && Second[3] == 4 && Second[4] == 4, "TestOps error");
+	ASSERT(Second[0] == 1 && Second[3] == 4 && Second[4] == 5, "TestOps error");
 
 	bool bThrown = false;
 	try
 	{
-		First.SafeAt(4);
+		Second.SafeAt(4);
 	}
 	catch (...)
 	{
@@ -92,6 +92,12 @@ void VectorTestOperators()
 	ASSERT(First.AutoAt(0) == 1 && First.SafeAt(1) == 2 &&
 		First[3] == 0 && First[9] == 9 && First.GetSize() == 10,
 		"TestOps error");
+
+	ASSERT(First + Second == TVector<int>(
+		{ 1, 2, 3, 0, 0, 0, 0, 0, 0, 9, 1, 2, 3, 4, 5 }), "TestOps error");
+	
+	ASSERT((Third += Second) == TVector<int>(
+		{ 1, 2, 3, 4, 5 }), "TestOps error");
 }
 
 
@@ -130,9 +136,10 @@ void VectorTestPushPopShift()
 	First.Push(2);
 	First.Push(3);
 	First.Push(4);
-	First.ShiftMultiple(2, true);
+	First.ShiftMultiple(2);
 
-	ASSERT(First.Shift() == 3 && First.Pop() == 4 && First.GetSize() == 0,
+	ASSERT(First.SafeShiftGet() == 3 && First.SafePopGet() == 4
+		&& First.GetSize() == 0,
 		"Vector PushPopShift error");
 
 	First = { 1,2,3,4,5 };
@@ -183,14 +190,13 @@ void VectorTestInsert()
 
 	First = { 1 };
 	Second = { 1,0,0,0,0,0,0,0,0,99 };
-	First.Insert(9, 99);
+	First.AutoInsert(9, 99);
 	ASSERT(First == Second, "Vector insert error");
 
 	First = {};
 	First.Insert(0, 1);
 	Second = { 1 };
 	ASSERT(First == Second, "Vector insert error");
-
 }
 
 
@@ -213,7 +219,7 @@ void VectorTestReserve()
 	ASSERT(First.GetCapacity() == 98 && First.GetSize() == 2,
 		"Vector capacity error");
 
-	First.Pop(true);
+	First.Pop();
 	ASSERT(First.GetCapacity() == 2, "Vector capacity error");
 
 	First.Pop();
@@ -230,7 +236,7 @@ void VectorTestReserve()
 
 	for (int i = 0; i < 50; ++i)
 	{
-		Second.Shift(true);
+		Second.Shift();
 		ASSERT(Second.GetSize() == Second.GetCapacity(), "Vector capacity error");
 	}
 	ASSERT(Second.GetCapacity() == 0, "Vector capacity error");
@@ -238,7 +244,7 @@ void VectorTestReserve()
 	Second.SetCapacityRule(TVector<int>::EReservedCapacityRule::Linear);
 	Second.Resize(64);
 	ASSERT(Second.GetCapacity() == 75, "Vector capacity error");
-	Second.Resize(15, 0, true);
+	Second.Resize(15, 0);
 	ASSERT(Second.GetCapacity() == 27, "Vector capacity error");
 
 	Second.Reserve(30);
@@ -273,7 +279,7 @@ void VectorTestResize()
 	TVector<int> Third = { 1,4,5,6,2,3 };
 	ASSERT(First == Third, "Vector resize error");
 
-	First.Insert(16, Second.Begin(), Second.End());
+	First.AutoInsert(16, Second.Begin(), Second.End());
 	Third = { 1,4,5,6,2,3,0,0,0,0,0,0,0,0,0,0,4,5,6 };
 	ASSERT(First == Third, "Vector resize error");
 
@@ -287,7 +293,7 @@ void VectorTestErase()
 {
 	TVector<int> First = { 1,2,3,4,5 };
 	First.Erase(0);
-	First.Erase(1, true);
+	First.Erase(1);
 	TVector<int> Second = { 2,4,5 };
 	ASSERT(First == Second, "Vector erase error");
 
@@ -296,12 +302,12 @@ void VectorTestErase()
 	ASSERT(First == Second, "Vector erase error");
 
 	First.Erase(0);
-	First.Erase(0, true);
+	First.Erase(0);
 	Second = {};
 	ASSERT(First == Second, "Vector erase error");
 
 	First = { 1,2,3,4,5 };
-	First.EraseMultiple(2, 10, true);
+	First.EraseMultiple(2, 10);
 	Second = { 1,2 };
 	ASSERT(First == Second, "Vector erase error");
 
@@ -313,7 +319,6 @@ void VectorTestErase()
 	First.EraseMultiple(0, 2);
 	First.EraseMultiple(0, 0);
 	First.EraseMultiple(0, 0);
-	First.Erase(100);
 	Second = { 4,5 };
 	ASSERT(First == Second, "Vector erase error");
 
@@ -353,6 +358,7 @@ void VectorTestIterators()
 	try
 	{
 		auto it = ++Third.SafeConstReverseEnd();
+		ASSERT(false, "Vector iterator error");
 	}
 	catch (const COutOfRange& Exception)
 	{
@@ -361,7 +367,7 @@ void VectorTestIterators()
 		RangeMax = Exception.GetExpectedRange().Second;
 		const char* Message = Exception.GetMessage();
 		ASSERT(AreRawStringsEqual(Message,
-			"Out of range: vector rev. iterator ++"),
+			"Out of range: vector rev. BlockIterator ++"),
 			"Vector iterator error");
 	}
 	ASSERT(ErrIndex == -1 && RangeMin == 0 && RangeMax == 5,
@@ -380,7 +386,7 @@ void VectorTestIterators()
 	ASSERT(ErrIndex == -1 && RangeMin == 0 && RangeMax == 5,
 		"Vector iterator error");
 
-	try 
+	try
 	{
 		auto it = Third.SafeConstEnd() + 1;
 	}
@@ -423,4 +429,36 @@ void VectorTestConst()
 	ASSERT(First.Front() == First.SafeAt(1), "Vector const error");
 	ASSERT(First.Back() - 2 == First[2], "Vector const error");
 	// no more tests needed thanks to IDE
+}
+
+
+class CTest
+{
+public:
+	CTest()
+	{
+		std::cout << "+ CTest constructed\n";
+	}
+	CTest(const CTest& Other)
+	{
+		std::cout << "+ CTest copy constructed\n";
+	}
+	CTest(CTest&& Other) noexcept
+	{
+		std::cout << "+ CTest move constructed\n";
+	}
+	~CTest()
+	{
+		std::cout << "- CTest destructed\n";
+	}
+};
+
+void VectorTestPlacementNew()
+{
+	CTest Var;
+	TVector<CTest> First;
+	for (int i = 0; i < 10; ++i)
+	{
+		First.Push(Var);
+	}
 }

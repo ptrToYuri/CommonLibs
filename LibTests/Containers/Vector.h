@@ -1,9 +1,10 @@
-// Yuri Zamyatin, 2020. This file is part of LibTests
+// Yuri Zamyatin, 2020-2021. This file is part of LibTests
 
 #pragma once
 
 // RUN IN DEBUG MODE!!
 
+#include <iostream>
 #include "CommonTypes/Vector.h"
 #include "CommonUtils/Assert.h"
 #include "CommonTypes/Exception.h"
@@ -20,11 +21,13 @@ void VectorTestResize();
 void VectorTestErase();
 void VectorTestIterators();
 void VectorTestConst();
+void VectorTestPlacementNew();
 
 
 inline void RunVectorTests()
 {
 	VectorTestConstructors();
+	VectorTestOperators();
 	VectorTestAssignment();
 	VectorTestPushPopShift();
 	VectorTestInsert();
@@ -33,4 +36,5 @@ inline void RunVectorTests()
 	VectorTestErase();
 	VectorTestIterators();
 	VectorTestConst();
+//	VectorTestPlacementNew();
 }

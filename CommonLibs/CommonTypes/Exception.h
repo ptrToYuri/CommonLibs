@@ -1,4 +1,4 @@
-// Yuri Zamyatin, 2020. This file is part of CommonLibs
+// Yuri Zamyatin, 2020-2021. This file is part of CommonLibs
 
 #pragma once
 
@@ -17,12 +17,12 @@ namespace Common {
 		 * @brief All exceptions must provide the message.
 		 * @param Message Error description. Will be copied
 		 *		  to an inner buffer
-		 * @note If length of message > 40, first 40 symbols
+		 * @note If length of message > 47, first 47 symbols
 		 *		 will be saved.
 		*/
 		CException(const char* Message) noexcept
 		{
-			CopyRawString(Message, this->Message, 40);
+			CopyRawString(Message, this->Message, 47);
 		};
 
 		virtual ~CException() {}
@@ -39,7 +39,7 @@ namespace Common {
 
 	protected:
 
-		char Message[41];
+		char Message[48];
 	};
 
 
@@ -54,7 +54,7 @@ namespace Common {
 		 * @brief Pass only message, if other properties cannot be specified.
 		 * @param Message Description. Will be copied to an inner buffer
 		 * @note Range will be set to empty [0: 0), requested index to 0.
-		 * @note If length of message > 40, first 40 symbols will be saved.
+		 * @note If length of message > 47, first 47 symbols will be saved.
 		*/
 		COutOfRange(const char* Message) noexcept
 			: CException(Message) {};
@@ -65,7 +65,7 @@ namespace Common {
 		 * @param RequestedIndex Errored index (out of range).
 		 * @param ExpectedIndex Pair of Min and Max+1 indexes, that were
 		 *		  available. Range: [First: Second)
-		 * @note If length of message > 40, first 40 symbols will be saved.
+		 * @note If length of message > 47, first 47 symbols will be saved.
 		*/
 		COutOfRange(const char* Message,
 			int RequestedIndex,
@@ -104,6 +104,46 @@ namespace Common {
 	};
 
 
+	/// Represents allocation failed error (usually rethrown from new)
+	class CBadAlloc : public CException
+	{
+
+	public:
+
+		/**
+		 * @brief Pass only message, if other properties cannot be specified.
+		 * @param Message Description. Will be copied to the inner buffer
+		 * @note If length of message > 47, first 47 symbols will be saved.
+		*/
+		CBadAlloc(const char* Message) noexcept
+			: CException(Message) {};
+
+		/**
+		 * @brief Also specify requested alloc size
+		 * @param Message Description. Will be copied to the inner buffer
+		 * @param RequestedAllocSize Requested allocation size
+		 * @return
+		*/
+		CBadAlloc(const char* Message, size_t RequestedAllocSize) noexcept
+			: CException(Message), RequestedAllocSize(RequestedAllocSize) {};
+
+		/**
+		 * @brief Size in bytes that was intended to be allocated.
+		 * @return Requested allocation size, that failed
+		 * @note Returns 0 if constructed only with message.
+		*/
+		size_t GetRequestedAllocSize()
+		{
+			return RequestedAllocSize;
+		}
+
+	protected:
+
+		const size_t RequestedAllocSize = 0;
+
+	};
+
+
 
 	/// Represents "Element does not exist" error. Stores message.
 	class CDoesNotExist : public CException
@@ -114,7 +154,7 @@ namespace Common {
 		/**
 		 * @brief Pass only message, if other properties cannot be specified.
 		 * @param Message Description. Will be copied to the inner buffer
-		 * @note If length of message > 40, first 40 symbols will be saved.
+		 * @note If length of message > 47, first 47 symbols will be saved.
 		*/
 		CDoesNotExist(const char* Message) noexcept
 			: CException(Message) {};

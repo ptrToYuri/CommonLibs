@@ -1,11 +1,16 @@
-// Yuri Zamyatin, 2020. This file is part of CommonLibs
+// Yuri Zamyatin, 2020-2021. This file is part of CommonLibs
 
 #pragma once
 
 namespace Common
 {
 
-	/// Represents a pair of objects
+	/**
+	 * @brief Container that represents a pair of objects.
+	 * 
+	 * @todo Placement new
+	 *		 
+	*/
 	template <typename T1, typename T2>
 	class TPair
 	{
