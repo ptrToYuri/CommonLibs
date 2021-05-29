@@ -45,6 +45,9 @@
     <ClInclude Include="CommonUtils\BlockAllocation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CommonUtils\Sort.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommonUtils\Private\AdvancedIteration.tpp">
@@ -60,6 +63,7 @@
     <None Include="CommonUtils\Private\TypeOperations.tpp" />
     <None Include="CommonTypes\Private\Vector\Iterator.tpp" />
     <None Include="CommonUtils\Private\BlockAllocation.tpp" />
+    <None Include="CommonUtils\Private\Sort.tpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommonUtils\Private\RawString.cpp">

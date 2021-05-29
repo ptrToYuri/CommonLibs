@@ -3,8 +3,10 @@
 #pragma once
 
 #include "RawString.h"
+#include "Sort.h"
 
-inline void TestRawString()
+inline void TestAlgorithms()
 {
 	RunRawStringTests();
+	RunSortTests();
 }

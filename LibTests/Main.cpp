@@ -6,5 +6,5 @@
 int main()
 {
 	TestContainers();
-	TestRawString();
+	TestAlgorithms();
 }

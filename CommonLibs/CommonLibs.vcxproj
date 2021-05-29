@@ -161,6 +161,7 @@
     <ClInclude Include="CommonUtils\AdvancedIteration.h" />
     <ClInclude Include="CommonUtils\Assert.h" />
     <ClInclude Include="CommonTypes\Vector.h" />
+    <ClInclude Include="CommonUtils\Sort.h" />
     <ClInclude Include="CommonUtils\TypeOperations.h" />
   </ItemGroup>
   <ItemGroup>
@@ -170,6 +171,7 @@
     <None Include="CommonTypes\Private\Iterators\Block.tpp" />
     <None Include="CommonUtils\Private\AdvancedIteration.tpp" />
     <None Include="CommonUtils\Private\BlockAllocation.tpp" />
+    <None Include="CommonUtils\Private\Sort.tpp" />
     <None Include="CommonUtils\Private\TypeOperations.tpp" />
   </ItemGroup>
   <ItemGroup>
