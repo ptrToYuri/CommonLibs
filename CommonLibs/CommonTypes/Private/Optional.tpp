@@ -95,7 +95,7 @@ namespace Common
 	template<typename T>
 	void TOptional<T>::Swap(TOptional<T>& Other)
 	{
-		::Swap(Other, *this);
+		Common::Swap(Other, *this);
 	}
 
 

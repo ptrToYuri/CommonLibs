@@ -129,8 +129,8 @@ namespace Common
 			throw;
 		}
 
-		::Swap(TempBuffer, Buffer);
-		::Swap(Size, NewSize);
+		Common::Swap(TempBuffer, Buffer);
+		Common::Swap(Size, NewSize);
 		Capacity = NewCapacity;
 
 		DestructAll(NewSize, TempBuffer);
@@ -165,8 +165,8 @@ namespace Common
 			throw;
 		}
 
-		::Swap(TempBuffer, Buffer);
-		::Swap(Size, NewSize);
+		Common::Swap(TempBuffer, Buffer);
+		Common::Swap(Size, NewSize);
 		Capacity = Other.Capacity;
 
 		DestructAll(NewSize, TempBuffer);
@@ -710,9 +710,9 @@ namespace Common
 	template<typename T>
 	void TVector<T>::Swap(TVector<T>& Other) noexcept
 	{
-		::Swap(Other.Buffer, this->Buffer);
-		::Swap(Other.Capacity, this->Capacity);
-		::Swap(Other.Size, this->Size);
+		Common::Swap(Other.Buffer, this->Buffer);
+		Common::Swap(Other.Capacity, this->Capacity);
+		Common::Swap(Other.Size, this->Size);
 	}
 
 

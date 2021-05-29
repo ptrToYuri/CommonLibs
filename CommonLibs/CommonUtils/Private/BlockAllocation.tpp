@@ -122,7 +122,7 @@ namespace Common
 			throw;
 		}
 
-		::Swap(TempBuffer, OutBuffer);
+		Common::Swap(TempBuffer, OutBuffer);
 		OutCopySize = CopySize;
 		OutAllocSize = AllocSize;
 
