@@ -9,22 +9,6 @@ namespace Common
 
 
 	template<typename T>
-	TVector<T>::TVector(const size_t Size,
-		const EReservedCapacityRule CapacityRule)
-		: Capacity(Size), CapacityRule(CapacityRule)
-	{
-		if (!Capacity)
-		{
-			return;
-		}
-
-		Allocate(Capacity, Buffer);
-		SafeFillConstruct(0, Capacity, Buffer, T{});
-		this->Size = Capacity;
-	};
-
-
-	template<typename T>
 	TVector<T>::TVector(const size_t Size, const T& DefaultValue,
 		const EReservedCapacityRule CapacityRule)
 		: Capacity(Size), CapacityRule(CapacityRule)

@@ -32,11 +32,11 @@ namespace Common
 
 	template <typename T>
 	void SafeMoveBlock(size_t Size, T* FromBuffer, T* ToBuffer);
-	template <typename T>
 
+	template <typename T>
 	void SafeMoveBlockReverse(size_t Size, T* FromBuffer, T* ToBuffer);
-	template <typename T>
 
+	template <typename T>
 	void Reconstruct(size_t CopySize, size_t NewCapacity,
 		T*& OutBuffer, size_t& OutCapacity, size_t& OutSize);
 

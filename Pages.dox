@@ -1,0 +1,36 @@
+/**
+ * @mainpage Home
+ * 
+ * @section Introduction
+ * 			Library contains custom types and utulites (vector, string, etc.)
+ * 			created with minimal dependency from standard libraries.
+ * 			I implement this for educational purposes only.
+ * 
+ * @section Installation
+ * 			<ol><li>Create Visual Studio solution or use existing one
+ * 			<li>Place this folder into your solution. I recommend using git
+ * 			submodules, because it allows to update lib easily:
+ * 			    <ol><li>`git init`, if you do not have repository yet
+ * 				<li>`git submodule add https://github.com/ptrToYuri/CommonLibs.git`</ol>
+ * 			<li>Right click on solution in Visual Studio -> Add -> Existing project</li>
+ * 			-> find and select "CommonLibs.vcxproj" in the file explorer
+ * 			<li>Right click on project in which you want to use with this lib -> Add
+ * 			-> Reference -> Select "CommonLibs" -> Ok</ol>
+ * 
+ * @section Update
+ * 			If you downloaded CommonLibs via git submodule, run
+ * 			`git submodule update --recursive --remote`. Otherwise files may
+ * 			be replaced manually.
+ * 
+ * @section GetStarted Get started
+ * 			Documentation is available on this website:
+ * 			<a href="namespaces.html">Namespaces</a>,
+ * 			<a href="annotated.html">List of classes</a>,
+ * 			<a href="files.html">List of header files</a>.<br>
+ * 			You can use the sidebar and dropdown menu for advanced navigation.
+ * 
+ * @section Reliability
+ * 			Code is neither enough optimized nor stable.
+ * 			Please, keep in mind that there might be bad pracices and mistakes
+ * 			if you want to learn something from this code.
+*/

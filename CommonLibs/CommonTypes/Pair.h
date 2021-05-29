@@ -7,8 +7,8 @@ namespace Common
 
 	/**
 	 * @brief Container that represents a pair of objects.
-	 * @note If the pair will be default-constucted, inner types
-	 *		 must also implement constructors with no params
+	 * 
+	 * @todo Placement new
 	 *		 
 	*/
 	template <typename T1, typename T2>

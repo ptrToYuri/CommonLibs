@@ -14,7 +14,11 @@
 namespace Common
 {
 
-	/// Represents object that may not exist.
+	/**
+	 * @brief Represents object that may not exist.
+	 * 
+	 * @todo SFINAE for == operator
+	*/
 	template <typename T>
 	class TOptional
 	{
