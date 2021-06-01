@@ -57,7 +57,13 @@ namespace Common
 
 	template<typename T>
 	TList<T>::TList(const TList<T>& Other)
-		:TList(Other.cbegin(), Other.cend()) {};
+		:TList(Other.cbegin(), Other.cend())
+	{
+		if (Other.Size)
+		{
+			Push(Other.Back());	// hack - iterators are broken due to non circularity
+		}						// todo: fix
+	};
 
 
 	template<typename T>
@@ -95,7 +101,7 @@ namespace Common
 			Current = Current->Next;
 			++TempSize;
 		}
-		
+
 		Clear();
 
 		Swap(Head, TempHead);
@@ -183,7 +189,7 @@ namespace Common
 		}
 		else
 		{
-			Tail->Previous = Temp;
+			Head->Previous = Temp;
 		}
 		Head = Temp;
 		++Size;
