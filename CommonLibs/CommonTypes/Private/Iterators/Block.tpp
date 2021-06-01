@@ -162,18 +162,18 @@ namespace Common
 
 		// ================ TSafeBlockIterator ================= //
 
-	/*	template <typename PtrType, typename RefType, typename ContType>
-		TSafeBlockIterator<PtrType, RefType, ContType>
-			::TSafeBlockIterator(PtrType InitialPosition, const ContType Owner)
+		template <typename PtrType, typename RefType, typename ContType>
+		TSafeBlockIterator<PtrType, RefType, ContType>::
+			TSafeBlockIterator(PtrType InitialPosition, const ContType Owner)
 			: InternalPointer(InitialPosition), Owner(Owner) {};
-			*/
+			
 		template <typename PtrType, typename RefType, typename ContType>
 		const TSafeBlockIterator<PtrType, RefType, ContType>&
 			TSafeBlockIterator<PtrType, RefType, ContType>::operator ++ ()
 		{
 			if (InternalPointer == Owner->Buffer + Owner->Size)
 			{
-				throw COutOfRange("Out of range: vector BlockIterator ++",
+				throw COutOfRange("Out of range: BlockIterator ++",
 					static_cast<int>(InternalPointer - Owner->Buffer),
 					TPair<size_t, size_t>(0, Owner->Size));
 			}
@@ -187,7 +187,7 @@ namespace Common
 		{
 			if (InternalPointer + Offset > Owner->Buffer + Owner->Size)
 			{
-				throw COutOfRange("Out of range: vector BlockIterator +",
+				throw COutOfRange("Out of range: BlockIterator +",
 					static_cast<int>(InternalPointer - 1 - Owner->Buffer)
 					+ static_cast<int>(Offset),
 					TPair<size_t, size_t>(0, Owner->Size));
@@ -201,7 +201,7 @@ namespace Common
 		{
 			if (InternalPointer + Offset > Owner->Buffer + Owner->Size)
 			{
-				throw COutOfRange("Out of range: vector BlockIterator +=",
+				throw COutOfRange("Out of range: BlockIterator +=",
 					static_cast<int>(InternalPointer - 1 - Owner->Buffer)
 					+ static_cast<int>(Offset),
 					TPair<size_t, size_t>(0, Owner->Size));
@@ -216,7 +216,7 @@ namespace Common
 		{
 			if (InternalPointer == Owner->Buffer)
 			{
-				throw COutOfRange("Out of range: vector BlockIterator --",
+				throw COutOfRange("Out of range: BlockIterator --",
 					static_cast<int>(InternalPointer - 1 - Owner->Buffer),
 					TPair<size_t, size_t>(0, Owner->Size));
 			}
@@ -230,7 +230,7 @@ namespace Common
 		{
 			if (InternalPointer - Offset < Owner->Buffer)
 			{
-				throw COutOfRange("Out of range: vector BlockIterator -",
+				throw COutOfRange("Out of range: BlockIterator -",
 					static_cast<int>(InternalPointer - Owner->Buffer)
 					- static_cast<int>(Offset),
 					TPair<size_t, size_t>(0, Owner->Size));
@@ -244,7 +244,7 @@ namespace Common
 		{
 			if (InternalPointer - Offset < Owner->Buffer)
 			{
-				throw COutOfRange("Out of range: vector BlockIterator -=",
+				throw COutOfRange("Out of range: BlockIterator -=",
 					static_cast<int>(InternalPointer - Owner->Buffer)
 					- static_cast<int>(Offset),
 					TPair<size_t, size_t>(0, Owner->Size));
@@ -288,7 +288,7 @@ namespace Common
 		{
 			if (InternalPointer + 1 == Owner->Buffer)
 			{
-				throw COutOfRange("Out of range: vector rev. BlockIterator ++",
+				throw COutOfRange("Out of range: rev. BlockIterator ++",
 					static_cast<int>(InternalPointer - Owner->Buffer),
 					TPair<size_t, size_t>(0, Owner->Size));
 			}
@@ -303,7 +303,7 @@ namespace Common
 		{
 			if (InternalPointer + 1 - Offset < Owner->Buffer)
 			{
-				throw COutOfRange("Out of range: vector rev. BlockIterator +",
+				throw COutOfRange("Out of range: rev. BlockIterator +",
 					static_cast<int>(InternalPointer + 1 - Owner->Buffer)
 					- static_cast<int>(Offset),
 					TPair<size_t, size_t>(0, Owner->Size));
@@ -318,7 +318,7 @@ namespace Common
 		{
 			if (InternalPointer + 1 - Offset < Owner->Buffer)
 			{
-				throw COutOfRange("Out of range: vector rev. BlockIterator +=",
+				throw COutOfRange("Out of range: rev. BlockIterator +=",
 					static_cast<int>(InternalPointer + 1 - Owner->Buffer)
 					- static_cast<int>(Offset),
 					TPair<size_t, size_t>(0, Owner->Size));
@@ -334,7 +334,7 @@ namespace Common
 		{
 			if (InternalPointer + 1 == Owner->Buffer + Owner->Size)
 			{
-				throw COutOfRange("Out of range: vector rev. BlockIterator --",
+				throw COutOfRange("Out of range: rev. BlockIterator --",
 					static_cast<int>(InternalPointer + 1 - Owner->Buffer),
 					TPair<size_t, size_t>(0, Owner->Size));
 			}
@@ -349,7 +349,7 @@ namespace Common
 		{
 			if (InternalPointer + 1 + Offset > Owner->Buffer + Owner->Size)
 			{
-				throw COutOfRange("Out of range: vector rev. BlockIterator -",
+				throw COutOfRange("Out of range: rev. BlockIterator -",
 					static_cast<int>(InternalPointer - Owner->Buffer)
 					+ static_cast<int>(Offset),
 					TPair<size_t, size_t>(0, Owner->Size));
@@ -364,7 +364,7 @@ namespace Common
 		{
 			if (InternalPointer + 1 + Offset > Owner->Buffer + Owner->Size)
 			{
-				throw COutOfRange("Out of range: vector rev. BlockIterator -=",
+				throw COutOfRange("Out of range: rev. BlockIterator -=",
 					static_cast<int>(InternalPointer - Owner->Buffer)
 					+ static_cast<int>(Offset),
 					TPair<size_t, size_t>(0, Owner->Size));

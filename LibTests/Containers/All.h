@@ -4,10 +4,12 @@
 
 #include "Vector.h"
 #include "Optional.h"
+#include "List.h"
 
 
 inline void TestContainers()
 {
 	RunVectorTests();
 	RunOptionalTests();
+	RunListTests();
 }

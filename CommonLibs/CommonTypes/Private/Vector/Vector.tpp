@@ -42,17 +42,7 @@ namespace Common
 
 	template<typename T>
 	TVector<T>::TVector(const std::initializer_list<T>& ValuesList)
-		: Capacity(ValuesList.size())
-	{
-		if (!Capacity)
-		{
-			return;
-		}
-
-		Allocate(Capacity, Buffer);
-		SafeBulkConstruct(0, ValuesList.begin(), ValuesList.end(), Buffer);
-		Size = Capacity;
-	}
+		: TVector(ValuesList.begin(), ValuesList.end()) {};
 
 
 	template <typename T>

@@ -32,8 +32,8 @@ namespace Common
 	 * to decrease TVector capacity, overriding EReservedCapacityRule
 	 * in terms of removing elements in this specific case.
 	 * 
-	 * Exception policy: TVector stays in the previous state if
-	 * construction fails. TVector is cleared if move construction of
+	 * Exception policy: Generally, TVector stays in the previous state if
+	 * operation fails. TVector is cleared if move construction of
 	 * the underlying object failed. TVector is in the broken state
 	 * if exception occured from TVector constructor, but destruction
 	 * is handled correctly. Rethrows original exception.
@@ -51,10 +51,14 @@ namespace Common
 	 *		 Capacity management is not consistent now, especially if
 	 *		 move operation throws
 	 * 
+	 * @todo Unshift method
+	 * 
 	 * @todo Implement SFINAE to support types without nonparam ctor
 	 *		 and types without overloaded == operator
 	 * 
-	 * @bug Move may not be performed
+	 * @todo Better iterator support
+	 * 
+	 * @bug Object might be copied when it could be moved
 	*/
 	template <typename T>
 	class TVector
@@ -730,15 +734,11 @@ namespace Common
 		void AutoShrinkIfNeeded(EShrinkBehavior ShrinkBehavior);
 
 
-		friend CIterator;
-		friend CConstIterator;
-		friend CReverseIterator;
-		friend CConstReverseIterator;
 		friend CSafeIterator;
 		friend CSafeConstIterator;
 		friend CSafeReverseIterator;
 		friend CSafeConstReverseIterator;
-
+		
 	};
 
 }

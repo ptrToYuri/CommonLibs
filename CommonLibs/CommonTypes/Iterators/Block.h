@@ -2,10 +2,13 @@
 
 #pragma once
 
+#include "./../Exception.h"
+
 namespace Common
 {
 
-	namespace Iterators {
+	namespace Iterators
+	{
 
 		template <typename PtrType, typename RefType>
 		class TBlockIterator
@@ -66,7 +69,7 @@ namespace Common
 
 		public:
 
-			TSafeBlockIterator(PtrType InitialPosition, const ContType Owner) : InternalPointer(InitialPosition), Owner(Owner) {};;
+			TSafeBlockIterator(PtrType InitialPosition, const ContType Owner);
 
 			const TSafeBlockIterator& operator ++ ();
 			TSafeBlockIterator operator + (size_t Offset);

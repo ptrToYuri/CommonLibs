@@ -154,6 +154,8 @@
   <ItemGroup>
     <ClInclude Include="CommonTypes\Exception.h" />
     <ClInclude Include="CommonTypes\Iterators\Block.h" />
+    <ClInclude Include="CommonTypes\Iterators\DoublyLinked.h" />
+    <ClInclude Include="CommonTypes\List.h" />
     <ClInclude Include="CommonUtils\BlockAllocation.h" />
     <ClInclude Include="CommonUtils\RawString.h" />
     <ClInclude Include="CommonTypes\Optional.h" />
@@ -165,6 +167,9 @@
     <ClInclude Include="CommonUtils\TypeOperations.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="CommonTypes\Private\Iterators\DoublyLinked.tpp" />
+    <None Include="CommonTypes\Private\List\Iterator.tpp" />
+    <None Include="CommonTypes\Private\List\List.tpp" />
     <None Include="CommonTypes\Private\Optional.tpp" />
     <None Include="CommonTypes\Private\Vector\Iterator.tpp" />
     <None Include="CommonTypes\Private\Vector\Vector.tpp" />
